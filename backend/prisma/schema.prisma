@@ -1,0 +1,314 @@
+// Prisma schema for HackMate
+// SQLite default for zero-setup portability, easily switchable to PostgreSQL
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id               String            @id @default(uuid())
+  email            String            @unique
+  passwordHash     String
+  role             String            // "candidate" | "team_leader" | "admin"
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
+
+  candidateProfile CandidateProfile?
+  leaderProfile    LeaderProfile?
+  notifications    Notification[]
+
+  @@index([role])
+}
+
+model CandidateProfile {
+  id                   String            @id @default(uuid())
+  userId               String            @unique
+  user                 User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  fullName             String
+  avatarUrl            String?
+  phone                String?
+  college              String
+  department           String
+  year                 Int               // 1, 2, 3, 4, etc.
+  gender               String?           // Male, Female, Other, Prefer not to say
+  bio                  String?
+  availability         String            @default("Available") // Available, Busy, Committed
+  hackathonsCount      Int               @default(0)
+  projects             String?           // JSON array or text
+  achievements         String?           // JSON array or text
+  certifications       String?           // JSON array or text
+  previousExperience   String?
+  preferredCategories  String?           // JSON array
+  profileCompleted     Boolean           @default(false)
+
+  // Scores
+  overallScore         Float             @default(0.0)
+  quizScore            Float             @default(0.0)
+  githubScore          Float             @default(0.0)
+  skillMatchScore      Float             @default(0.0)
+  experienceScore      Float             @default(0.0)
+
+  createdAt            DateTime          @default(now())
+  updatedAt            DateTime          @updatedAt
+
+  skills               CandidateSkill[]
+  preferredRoles       CandidateRole[]
+  githubAnalysis       GitHubAnalysis?
+  quizAttempts         QuizAttempt[]
+  teamMemberships      TeamMember[]
+  invitations          Invitation[]
+
+  @@index([department])
+  @@index([overallScore])
+}
+
+model LeaderProfile {
+  id             String       @id @default(uuid())
+  userId         String       @unique
+  user           User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  fullName       String
+  avatarUrl      String?
+  college        String
+  department     String
+  year           Int
+  bio            String?
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+
+  teams          Team[]
+  invitations    Invitation[]
+}
+
+model Skill {
+  id           String            @id @default(uuid())
+  name         String            @unique
+  category     String            // "Programming", "Web Development", "AI / ML", "Data", "Other"
+  description  String?
+  createdAt    DateTime          @default(now())
+
+  candidates   CandidateSkill[]
+  questions    Question[]
+}
+
+model Role {
+  id           String            @id @default(uuid())
+  name         String            @unique
+  category     String            @default("Engineering")
+  description  String?
+  createdAt    DateTime          @default(now())
+
+  candidates   CandidateRole[]
+  questions    Question[]
+}
+
+model CandidateSkill {
+  id                 String           @id @default(uuid())
+  candidateProfileId String
+  candidateProfile   CandidateProfile @relation(fields: [candidateProfileId], references: [id], onDelete: Cascade)
+  skillId            String
+  skill              Skill            @relation(fields: [skillId], references: [id], onDelete: Cascade)
+  proficiency        String?          @default("Intermediate") // Beginner, Intermediate, Advanced
+
+  @@unique([candidateProfileId, skillId])
+}
+
+model CandidateRole {
+  id                 String           @id @default(uuid())
+  candidateProfileId String
+  candidateProfile   CandidateProfile @relation(fields: [candidateProfileId], references: [id], onDelete: Cascade)
+  roleId             String
+  role               Role             @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  isPrimary          Boolean          @default(false)
+
+  @@unique([candidateProfileId, roleId])
+}
+
+model Hackathon {
+  id                   String       @id @default(uuid())
+  name                 String
+  slug                 String       @unique
+  description          String
+  organizer            String
+  registrationDeadline DateTime
+  minTeamSize          Int          @default(3)
+  maxTeamSize          Int          @default(6)
+  problemStatements    String?      // JSON array
+  rules                String?
+  bannerUrl            String?
+  status               String       @default("ACTIVE") // ACTIVE, UPCOMING, COMPLETED
+  createdAt            DateTime     @default(now())
+  updatedAt            DateTime     @updatedAt
+
+  teams                Team[]
+}
+
+model Team {
+  id                 String            @id @default(uuid())
+  name               String
+  description        String
+  hackathonId        String
+  hackathon          Hackathon         @relation(fields: [hackathonId], references: [id], onDelete: Cascade)
+  leaderProfileId    String
+  leader             LeaderProfile     @relation(fields: [leaderProfileId], references: [id], onDelete: Cascade)
+  maxTeamSize        Int               @default(6)
+  minCandidateScore  Float             @default(70.0)
+  preferredDept      String?
+  availabilityReq    String?           @default("Full-time during hackathon")
+  status             String            @default("RECRUITING") // RECRUITING, FULL, LOCKED
+  createdAt          DateTime          @default(now())
+  updatedAt          DateTime          @updatedAt
+
+  requirements       TeamRequirement[]
+  members            TeamMember[]
+  invitations        Invitation[]
+
+  @@index([hackathonId])
+  @@index([leaderProfileId])
+}
+
+model TeamRequirement {
+  id          String   @id @default(uuid())
+  teamId      String
+  team        Team     @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  roleName    String   // e.g. "AI/ML Developer", "Frontend Developer"
+  skillNames  String?  // JSON array string of required skill names
+  isRequired  Boolean  @default(true)
+  filledCount Int      @default(0)
+  neededCount Int      @default(1)
+
+  @@index([teamId])
+}
+
+model TeamMember {
+  id                 String           @id @default(uuid())
+  teamId             String
+  team               Team             @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  candidateProfileId String
+  candidate          CandidateProfile @relation(fields: [candidateProfileId], references: [id], onDelete: Cascade)
+  assignedRole       String
+  joinedAt           DateTime         @default(now())
+
+  @@unique([teamId, candidateProfileId])
+}
+
+model Invitation {
+  id                 String           @id @default(uuid())
+  teamId             String
+  team               Team             @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  candidateProfileId String
+  candidate          CandidateProfile @relation(fields: [candidateProfileId], references: [id], onDelete: Cascade)
+  leaderProfileId    String
+  leader             LeaderProfile    @relation(fields: [leaderProfileId], references: [id], onDelete: Cascade)
+  roleName           String
+  message            String?
+  status             String           @default("PENDING") // PENDING, ACCEPTED, DECLINED, EXPIRED, CANCELLED
+  createdAt          DateTime         @default(now())
+  updatedAt          DateTime         @updatedAt
+  respondedAt        DateTime?
+
+  @@index([candidateProfileId])
+  @@index([teamId])
+  @@index([status])
+}
+
+model Notification {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title     String
+  message   String
+  type      String   // "INVITATION", "ACCEPTED", "DECLINED", "QUIZ", "GITHUB", "SYSTEM"
+  link      String?
+  isRead    Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+}
+
+model GitHubAnalysis {
+  id                   String           @id @default(uuid())
+  candidateProfileId   String           @unique
+  candidateProfile     CandidateProfile @relation(fields: [candidateProfileId], references: [id], onDelete: Cascade)
+  username             String
+  publicRepos          Int              @default(0)
+  totalStars           Int              @default(0)
+  topLanguages         String           // JSON string
+  recentActivityLevel  String           @default("Moderate") // High, Moderate, Low
+  readmeCoverage       String           @default("Moderate") // Strong, Moderate, Basic, Low
+  technicalStrengths   String           // JSON string
+  projectExperience    String           // JSON string
+  score                Float            @default(70.0)
+  rawData              String?          // JSON string
+  analyzedAt           DateTime         @default(now())
+}
+
+model Question {
+  id          String           @id @default(uuid())
+  text        String
+  explanation String
+  difficulty  String           @default("MEDIUM") // EASY, MEDIUM, HARD
+  topic       String           // Subtopic e.g. "React Hooks", "Loss Functions"
+  skillId     String?
+  skill       Skill?           @relation(fields: [skillId], references: [id], onDelete: SetNull)
+  roleId      String?
+  role        Role?            @relation(fields: [roleId], references: [id], onDelete: SetNull)
+  createdAt   DateTime         @default(now())
+
+  options     QuestionOption[]
+  answers     QuizAnswer[]
+
+  @@index([difficulty])
+  @@index([topic])
+}
+
+model QuestionOption {
+  id         String     @id @default(uuid())
+  questionId String
+  question   Question   @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  text       String
+  isCorrect  Boolean    @default(false)
+
+  answers    QuizAnswer[]
+}
+
+model QuizAttempt {
+  id                    String           @id @default(uuid())
+  candidateProfileId    String
+  candidateProfile      CandidateProfile @relation(fields: [candidateProfileId], references: [id], onDelete: Cascade)
+  roleName              String
+  totalQuestions        Int
+  correctCount          Int
+  scorePercentage       Float
+  skillBreakdown        String           // JSON string
+  difficultyBreakdown   String           // JSON string
+  completedAt           DateTime         @default(now())
+
+  answers               QuizAnswer[]
+
+  @@index([candidateProfileId])
+}
+
+model QuizAnswer {
+  id               String          @id @default(uuid())
+  attemptId        String
+  attempt          QuizAttempt     @relation(fields: [attemptId], references: [id], onDelete: Cascade)
+  questionId       String
+  question         Question        @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  selectedOptionId String?
+  selectedOption   QuestionOption? @relation(fields: [selectedOptionId], references: [id], onDelete: SetNull)
+  isCorrect        Boolean         @default(false)
+}
+
+model ScoringConfiguration {
+  id               String   @id @default("default")
+  quizWeight       Float    @default(0.50)
+  githubWeight     Float    @default(0.25)
+  skillMatchWeight Float    @default(0.15)
+  experienceWeight Float    @default(0.10)
+  updatedAt        DateTime @updatedAt
+}
