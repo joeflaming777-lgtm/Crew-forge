@@ -207,7 +207,7 @@ export const CandidateBrowseTeams: React.FC = () => {
 
             <div style={{ padding: '12px 16px', borderRadius: '12px', background: 'rgba(99, 102, 241, 0.08)', border: '1px solid rgba(99, 102, 241, 0.2)' }}>
               <div style={{ fontSize: '0.85rem', color: '#a5b4fc', lineHeight: 1.5 }}>
-                💡 <strong>How Joining Works:</strong> In accordance with HackMate governance, clicking "Express Interest" notifies the Team Leader. The Team Leader will review your verified quiz and GitHub evidence to issue an official invitation.
+                💡 <strong>How Joining Works:</strong> In accordance with SkillSync governance, clicking "Express Interest" notifies the Team Leader. The Team Leader will review your verified quiz and GitHub evidence to issue an official invitation.
               </div>
             </div>
 

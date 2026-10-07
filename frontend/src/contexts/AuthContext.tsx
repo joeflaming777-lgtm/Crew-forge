@@ -28,10 +28,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       });
       if (res.data.success) {
         setUser(res.data.user);
-        localStorage.setItem('hackmate_user', JSON.stringify(res.data.user));
+        localStorage.setItem('skillsync_user', JSON.stringify(res.data.user));
       }
     } catch (err) {
       console.warn('Failed to verify existing session:', err);
+      localStorage.removeItem('skillsync_token');
+      localStorage.removeItem('skillsync_user');
       localStorage.removeItem('hackmate_token');
       localStorage.removeItem('hackmate_user');
       setUser(null);
@@ -42,8 +44,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   useEffect(() => {
-    const savedToken = localStorage.getItem('hackmate_token');
-    const savedUser = localStorage.getItem('hackmate_user');
+    const savedToken = localStorage.getItem('skillsync_token') || localStorage.getItem('hackmate_token');
+    const savedUser = localStorage.getItem('skillsync_user') || localStorage.getItem('hackmate_user');
 
     if (savedToken) {
       setToken(savedToken);
@@ -63,20 +65,22 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const login = (newToken: string, newUser: User) => {
     setToken(newToken);
     setUser(newUser);
-    localStorage.setItem('hackmate_token', newToken);
-    localStorage.setItem('hackmate_user', JSON.stringify(newUser));
+    localStorage.setItem('skillsync_token', newToken);
+    localStorage.setItem('skillsync_user', JSON.stringify(newUser));
   };
 
   const logout = () => {
     setUser(null);
     setToken(null);
+    localStorage.removeItem('skillsync_token');
+    localStorage.removeItem('skillsync_user');
     localStorage.removeItem('hackmate_token');
     localStorage.removeItem('hackmate_user');
     window.location.href = '/';
   };
 
   const refreshUser = async () => {
-    const currentToken = token || localStorage.getItem('hackmate_token');
+    const currentToken = token || localStorage.getItem('skillsync_token') || localStorage.getItem('hackmate_token');
     if (currentToken) {
       await fetchCurrentUser(currentToken);
     }

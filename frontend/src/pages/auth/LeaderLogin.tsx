@@ -37,7 +37,7 @@ export const LeaderLogin: React.FC = () => {
   };
 
   const fillDemoLeader = () => {
-    setEmail('leader@hackmate.dev');
+    setEmail('leader@skillsync.dev');
     setPassword('leader123');
   };
 

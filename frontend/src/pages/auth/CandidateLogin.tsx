@@ -43,7 +43,7 @@ export const CandidateLogin: React.FC = () => {
   };
 
   const fillDemoCandidate = () => {
-    setEmail('candidate@hackmate.dev');
+    setEmail('candidate@skillsync.dev');
     setPassword('candidate123');
   };
 

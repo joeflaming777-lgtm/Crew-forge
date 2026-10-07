@@ -32,7 +32,7 @@ app.get('/health', (req, res) => {
   res.json({
     status: 'ok',
     timestamp: new Date().toISOString(),
-    service: 'HackMate API',
+    service: 'SkillSync API',
   });
 });
 
@@ -49,6 +49,6 @@ app.use((err: any, req: express.Request, res: express.Response, next: express.Ne
 });
 
 app.listen(PORT, () => {
-  console.log(`🚀 HackMate Backend running on http://localhost:${PORT}`);
+  console.log(`🚀 SkillSync Backend running on http://localhost:${PORT}`);
   console.log(`📡 API endpoints ready at http://localhost:${PORT}/api`);
 });

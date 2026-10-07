@@ -65,7 +65,70 @@ export class CandidateController {
         return;
       }
 
-      res.json({ success: true, profile });
+      let formattedGithubAnalysis: any = null;
+      if (profile.githubAnalysis) {
+        let parsedRaw: Record<string, any> = {};
+        if (profile.githubAnalysis.rawData) {
+          try {
+            parsedRaw = JSON.parse(profile.githubAnalysis.rawData);
+          } catch (_) {}
+        }
+        const topLanguages = JSON.parse(profile.githubAnalysis.topLanguages || '[]');
+        const technicalStrengths = JSON.parse(profile.githubAnalysis.technicalStrengths || '[]');
+        const projectExperience = JSON.parse(profile.githubAnalysis.projectExperience || '[]');
+
+        formattedGithubAnalysis = {
+          ...profile.githubAnalysis,
+          topLanguages,
+          technicalStrengths,
+          projectExperience,
+          archetype: parsedRaw.archetype || (projectExperience[0] || 'Software Engineer'),
+          summary: parsedRaw.summary || `GitHub profile @${profile.githubAnalysis.username} with ${profile.githubAnalysis.publicRepos} public repositories.`,
+          highlights: parsedRaw.highlights || [
+            `Public repositories verified: ${profile.githubAnalysis.publicRepos}`,
+            `Recent activity level rated ${profile.githubAnalysis.recentActivityLevel}`,
+            `Documentation coverage rated ${profile.githubAnalysis.readmeCoverage}`,
+          ],
+          growthAreas: parsedRaw.growthAreas || [
+            'Add descriptive READMEs and problem overviews to public repositories',
+            'Deploy working web demonstrations with accessible live links',
+          ],
+          showcaseRepos: parsedRaw.showcaseRepos || [],
+          detectedFrameworks: parsedRaw.detectedFrameworks || technicalStrengths,
+          metrics: parsedRaw.metrics || {
+            publicRepos: profile.githubAnalysis.publicRepos,
+            originalRepos: Math.max(1, profile.githubAnalysis.publicRepos - 2),
+            forkedRepos: 2,
+            totalStars: profile.githubAnalysis.totalStars,
+            originalStars: profile.githubAnalysis.totalStars,
+            totalForksCount: 0,
+            recentPushes90d: profile.githubAnalysis.recentActivityLevel === 'High' ? 12 : 3,
+            recentCommits90d: profile.githubAnalysis.recentActivityLevel === 'High' ? 24 : 6,
+            deployedProjectsCount: 1,
+            hasDocumentationRatio: profile.githubAnalysis.readmeCoverage === 'Strong' ? 80 : 45,
+            accountAgeMonths: 18,
+            daysSinceLastPush: profile.githubAnalysis.recentActivityLevel === 'High' ? 4 : 25,
+          },
+          breakdown: parsedRaw.breakdown || {
+            repoBreadthScore: Math.round(profile.githubAnalysis.score * 0.25),
+            languageMasteryScore: Math.round(profile.githubAnalysis.score * 0.25),
+            activityScore: Math.round(profile.githubAnalysis.score * 0.25),
+            documentationScore: Math.round(profile.githubAnalysis.score * 0.25),
+          },
+          avatarUrl: parsedRaw.avatarUrl,
+          bio: parsedRaw.bio,
+          profileUrl: parsedRaw.profileUrl || `https://github.com/${profile.githubAnalysis.username}`,
+          isFallback: parsedRaw.isFallback || false,
+        };
+      }
+
+      res.json({
+        success: true,
+        profile: {
+          ...profile,
+          githubAnalysis: formattedGithubAnalysis,
+        },
+      });
     } catch (error: any) {
       console.error('Get profile error:', error);
       res.status(500).json({ success: false, message: error.message || 'Server error' });

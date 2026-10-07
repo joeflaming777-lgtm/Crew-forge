@@ -24,9 +24,47 @@ export interface Role {
   isPrimary?: boolean;
 }
 
+export interface ShowcaseRepo {
+  name: string;
+  description: string | null;
+  language: string | null;
+  stars: number;
+  forks: number;
+  topics: string[];
+  repoUrl: string;
+  liveUrl?: string | null;
+  isFork: boolean;
+  updatedAt: string;
+}
+
+export interface GitHubMetrics {
+  publicRepos: number;
+  originalRepos: number;
+  forkedRepos: number;
+  totalStars: number;
+  originalStars: number;
+  totalForksCount: number;
+  recentPushes90d: number;
+  recentCommits90d: number;
+  deployedProjectsCount: number;
+  hasDocumentationRatio: number;
+  accountAgeMonths: number;
+  daysSinceLastPush: number;
+}
+
+export interface GitHubScoreBreakdown {
+  repoBreadthScore: number;     // 0 - 25
+  languageMasteryScore: number; // 0 - 25
+  activityScore: number;        // 0 - 25
+  documentationScore: number;   // 0 - 25
+}
+
 export interface GitHubAnalysis {
   id?: string;
   username: string;
+  avatarUrl?: string;
+  bio?: string;
+  profileUrl?: string;
   publicRepos: number;
   totalStars: number;
   recentActivityLevel: 'High' | 'Moderate' | 'Low';
@@ -34,7 +72,17 @@ export interface GitHubAnalysis {
   topLanguages: { name: string; percentage: number; count: number }[];
   technicalStrengths: string[];
   projectExperience: string[];
+  detectedFrameworks?: string[];
+  archetype?: string;
+  summary?: string;
+  highlights?: string[];
+  growthAreas?: string[];
+  showcaseRepos?: ShowcaseRepo[];
+  metrics?: GitHubMetrics;
+  breakdown?: GitHubScoreBreakdown;
   score: number;
+  isFallback?: boolean;
+  fallbackReason?: string;
   analyzedAt?: string;
 }
 

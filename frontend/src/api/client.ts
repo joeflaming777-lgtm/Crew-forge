@@ -11,7 +11,7 @@ export const apiClient = axios.create({
 
 // Attach Authorization Bearer token automatically
 apiClient.interceptors.request.use((config) => {
-  const token = localStorage.getItem('hackmate_token');
+  const token = localStorage.getItem('skillsync_token') || localStorage.getItem('hackmate_token');
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
@@ -30,6 +30,8 @@ apiClient.interceptors.response.use(
         !currentPath.includes('/register') &&
         currentPath !== '/'
       ) {
+        localStorage.removeItem('skillsync_token');
+        localStorage.removeItem('skillsync_user');
         localStorage.removeItem('hackmate_token');
         localStorage.removeItem('hackmate_user');
       }

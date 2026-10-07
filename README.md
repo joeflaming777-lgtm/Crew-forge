@@ -1,16 +1,16 @@
-# HackMate
+# SkillSync
 
 > **Find Your People. Build Your Team.**
 
-HackMate is a smart hackathon team formation and candidate selection web platform designed for college students participating in hackathons such as the Smart India Hackathon (SIH).
+SkillSync is a smart hackathon team formation and candidate selection web platform designed for college students participating in hackathons such as the Smart India Hackathon (SIH).
 
 ---
 
 ## 🌟 Key Features
 
 ### 1. Website Entry Experience
-- **Screen 1: Hero / Project Logo**: Centered HackMate logo reveal, tagline *"Find Your People. Build Your Team."*, ambient particle motion, and *"Swipe up to explore ↑"* indicator.
-- **Screen 2: Why HackMate?**: Clear problem and solution statements with 4 modern feature cards (**Discover**, **Evaluate**, **Match**, **Build**).
+- **Screen 1: Hero / Project Logo**: Centered SkillSync logo reveal, tagline *"Find Your People. Build Your Team."*, ambient particle motion, and *"Swipe up to explore ↑"* indicator.
+- **Screen 2: Why SkillSync?**: Clear problem and solution statements with 4 modern feature cards (**Discover**, **Evaluate**, **Match**, **Build**).
 - **Screen 3: Choose Your Path**: Dual interactive cards for **Candidate Portal** and **Team Leader Portal**, with 1-click demo login buttons for rapid evaluation.
 
 ### 2. Candidate Portal

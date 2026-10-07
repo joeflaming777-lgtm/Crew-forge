@@ -168,7 +168,7 @@ export const Navbar: React.FC = () => {
               WebkitTextFillColor: 'transparent',
             }}
           >
-            HackMate
+            SkillSync
           </span>
         </Link>
 

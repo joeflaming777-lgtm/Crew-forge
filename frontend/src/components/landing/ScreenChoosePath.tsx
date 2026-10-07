@@ -14,14 +14,14 @@ export const ScreenChoosePath: React.FC = () => {
   const handleQuickLogin = async (role: 'candidate' | 'team_leader' | 'admin') => {
     try {
       let endpoint = '/auth/candidate/login';
-      let payload = { email: 'candidate@hackmate.dev', password: 'candidate123' };
+      let payload = { email: 'candidate@skillsync.dev', password: 'candidate123' };
 
       if (role === 'team_leader') {
         endpoint = '/auth/leader/login';
-        payload = { email: 'leader@hackmate.dev', password: 'leader123' };
+        payload = { email: 'leader@skillsync.dev', password: 'leader123' };
       } else if (role === 'admin') {
         endpoint = '/auth/admin/login';
-        payload = { email: 'admin@hackmate.dev', password: 'admin123' };
+        payload = { email: 'admin@skillsync.dev', password: 'admin123' };
       }
 
       toast.info(`Logging in as Demo ${role.replace('_', ' ')}...`);
@@ -80,7 +80,7 @@ export const ScreenChoosePath: React.FC = () => {
               color: '#94a3b8',
             }}
           >
-            How are you joining HackMate?
+            How are you joining SkillSync?
           </motion.p>
         </div>
 

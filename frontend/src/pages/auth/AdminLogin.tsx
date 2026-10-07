@@ -32,7 +32,7 @@ export const AdminLogin: React.FC = () => {
   };
 
   const fillDemoAdmin = () => {
-    setEmail('admin@hackmate.dev');
+    setEmail('admin@skillsync.dev');
     setPassword('admin123');
   };
 
@@ -89,7 +89,7 @@ export const AdminLogin: React.FC = () => {
               <input
                 type="email"
                 className="input-field"
-                placeholder="admin@hackmate.dev"
+                placeholder="admin@skillsync.dev"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 style={{ paddingLeft: '2.75rem' }}

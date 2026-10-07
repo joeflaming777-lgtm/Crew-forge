@@ -4,7 +4,7 @@ import bcrypt from 'bcryptjs';
 const prisma = new PrismaClient();
 
 async function main() {
-  console.log('🌱 Starting HackMate database seeding...');
+  console.log('🌱 Starting SkillSync database seeding...');
 
   // Clear existing data in reverse order of foreign keys
   await prisma.quizAnswer.deleteMany({});
@@ -480,7 +480,7 @@ async function main() {
   const defaultPasswordHash = await bcrypt.hash('admin123', 10);
   await prisma.user.create({
     data: {
-      email: 'admin@hackmate.dev',
+      email: 'admin@skillsync.dev',
       passwordHash: defaultPasswordHash,
       role: 'admin',
     },
@@ -491,7 +491,7 @@ async function main() {
 
   const leadersData = [
     {
-      email: 'leader@hackmate.dev',
+      email: 'leader@skillsync.dev',
       fullName: 'Aarav Sharma',
       college: 'IIT Bombay',
       department: 'Computer Science and Engineering',
@@ -513,7 +513,7 @@ async function main() {
       ],
     },
     {
-      email: 'priya.leader@hackmate.dev',
+      email: 'priya.leader@skillsync.dev',
       fullName: 'Priya Patel',
       college: 'BITS Pilani',
       department: 'Electronics & Communication',
@@ -534,7 +534,7 @@ async function main() {
       ],
     },
     {
-      email: 'rohan.leader@hackmate.dev',
+      email: 'rohan.leader@skillsync.dev',
       fullName: 'Rohan Deshmukh',
       college: 'NIT Trichy',
       department: 'Information Technology',
@@ -554,7 +554,7 @@ async function main() {
       ],
     },
     {
-      email: 'ananya.leader@hackmate.dev',
+      email: 'ananya.leader@skillsync.dev',
       fullName: 'Ananya Iyer',
       college: 'VIT Vellore',
       department: 'Computer Science and Engineering',
@@ -574,7 +574,7 @@ async function main() {
       ],
     },
     {
-      email: 'vikram.leader@hackmate.dev',
+      email: 'vikram.leader@skillsync.dev',
       fullName: 'Vikramaditya Rao',
       college: 'IIIT Hyderabad',
       department: 'Computer Science and Engineering',
@@ -653,7 +653,7 @@ async function main() {
   const candidateDataset = [
     // 1. Default Demo Candidate
     {
-      email: 'candidate@hackmate.dev',
+      email: 'candidate@skillsync.dev',
       fullName: 'Arjun Verma',
       college: 'IIT Bombay',
       department: 'Computer Science and Engineering',
@@ -1445,7 +1445,7 @@ async function main() {
   });
 
   // Notification for Arjun
-  const arjunUser = await prisma.user.findFirst({ where: { email: 'candidate@hackmate.dev' } });
+  const arjunUser = await prisma.user.findFirst({ where: { email: 'candidate@skillsync.dev' } });
   if (arjunUser) {
     await prisma.notification.create({
       data: {
@@ -1483,7 +1483,7 @@ async function main() {
     },
   });
 
-  console.log('🎉 HackMate Seed completed successfully with 32 candidates, 5 teams, and active invitations!');
+  console.log('🎉 SkillSync Seed completed successfully with 32 candidates, 5 teams, and active invitations!');
 }
 
 main()

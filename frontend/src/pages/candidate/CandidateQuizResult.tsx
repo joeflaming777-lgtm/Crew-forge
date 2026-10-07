@@ -117,7 +117,7 @@ export const CandidateQuizResult: React.FC = () => {
           Assessment Complete 🎉
         </h2>
         <p style={{ color: '#94a3b8', fontSize: '1.05rem', marginBottom: '2rem' }}>
-          Your verified technical score has been recorded and factored into your HackMate ranking.
+          Your verified technical score has been recorded and factored into your SkillSync ranking.
         </p>
 
         <div style={{ display: 'flex', justifyContent: 'center', gap: '3rem', flexWrap: 'wrap' }}>

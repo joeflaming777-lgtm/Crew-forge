@@ -12,6 +12,13 @@ import {
   Sparkles,
   ArrowRight,
   AlertCircle,
+  ExternalLink,
+  Star,
+  GitFork,
+  Globe,
+  Activity,
+  CheckCircle2,
+  Layers,
 } from 'lucide-react';
 import { apiClient } from '../../api/client';
 import { useAuth } from '../../contexts/AuthContext';
@@ -529,7 +536,7 @@ export const CandidateOnboarding: React.FC = () => {
                 Step 5: Mandatory GitHub Verification
               </h3>
               <p style={{ fontSize: '0.9rem', color: '#94a3b8', marginBottom: '2rem' }}>
-                HackMate computes explainable technical scores from your public GitHub activity. A valid GitHub username is required.
+                SkillSync computes explainable technical scores from your public GitHub activity. A valid GitHub username is required.
               </p>
 
               <div className="form-group" style={{ marginBottom: '1.5rem' }}>
@@ -565,44 +572,340 @@ export const CandidateOnboarding: React.FC = () => {
               {/* GitHub Analysis Result Card */}
               {githubResult && (
                 <motion.div
-                  initial={{ opacity: 0, scale: 0.96 }}
+                  initial={{ opacity: 0, scale: 0.98 }}
                   animate={{ opacity: 1, scale: 1 }}
                   style={{
-                    background: 'rgba(99, 102, 241, 0.08)',
-                    border: '1px solid rgba(99, 102, 241, 0.3)',
-                    borderRadius: '16px',
-                    padding: '1.5rem',
+                    background: 'linear-gradient(145deg, rgba(30, 41, 59, 0.8), rgba(15, 23, 42, 0.9))',
+                    border: '1px solid rgba(99, 102, 241, 0.35)',
+                    borderRadius: '20px',
+                    padding: '1.75rem',
                     marginBottom: '1.5rem',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                    flexWrap: 'wrap',
-                    gap: '1.5rem',
+                    boxShadow: '0 8px 32px rgba(0, 0, 0, 0.36)',
                   }}
                 >
-                  <div style={{ flex: 1, minWidth: '220px' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
-                      <span style={{ fontWeight: 800, fontSize: '1.1rem', color: '#f8fafc' }}>
-                        @{githubResult.username}
-                      </span>
-                      <span className="badge badge-success">Verified</span>
+                  {/* Top Bar: Profile & Score */}
+                  <div
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      flexWrap: 'wrap',
+                      gap: '1rem',
+                      paddingBottom: '1.25rem',
+                      borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
+                    }}
+                  >
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+                      {githubResult.avatarUrl ? (
+                        <img
+                          src={githubResult.avatarUrl}
+                          alt={githubResult.username}
+                          style={{ width: '52px', height: '52px', borderRadius: '50%', border: '2px solid #818cf8' }}
+                        />
+                      ) : (
+                        <div
+                          style={{
+                            width: '52px',
+                            height: '52px',
+                            borderRadius: '50%',
+                            background: 'rgba(99, 102, 241, 0.2)',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            border: '1px solid #818cf8',
+                          }}
+                        >
+                          <Github size={26} color="#818cf8" />
+                        </div>
+                      )}
+                      <div>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+                          <span style={{ fontWeight: 800, fontSize: '1.2rem', color: '#f8fafc' }}>
+                            @{githubResult.username}
+                          </span>
+                          <a
+                            href={githubResult.profileUrl || `https://github.com/${githubResult.username}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            style={{ color: '#94a3b8', display: 'flex', alignItems: 'center' }}
+                            title="View GitHub Profile"
+                          >
+                            <ExternalLink size={14} />
+                          </a>
+                          <span className="badge badge-success" style={{ fontSize: '0.7rem' }}>
+                            ✓ Verified Public GitHub
+                          </span>
+                          {githubResult.archetype && (
+                            <span
+                              className="badge"
+                              style={{
+                                background: 'rgba(99, 102, 241, 0.25)',
+                                color: '#a5b4fc',
+                                border: '1px solid rgba(99, 102, 241, 0.4)',
+                                fontWeight: 700,
+                              }}
+                            >
+                              {githubResult.archetype}
+                            </span>
+                          )}
+                        </div>
+                        <p style={{ margin: '4px 0 0', fontSize: '0.85rem', color: '#94a3b8' }}>
+                          Technical evaluation synthesized from public repositories, events, and code evidence.
+                        </p>
+                      </div>
                     </div>
 
-                    <div style={{ fontSize: '0.85rem', color: '#94a3b8', lineHeight: 1.6 }}>
-                      <div>Public Repos: <strong style={{ color: '#fff' }}>{githubResult.publicRepos}</strong> • Stars: <strong style={{ color: '#fff' }}>{githubResult.totalStars}</strong></div>
-                      <div>Recent Activity: <strong style={{ color: '#fff' }}>{githubResult.recentActivityLevel}</strong> • README: <strong style={{ color: '#fff' }}>{githubResult.readmeCoverage}</strong></div>
+                    <ScoreRing score={githubResult.score} size={84} label="GitHub Score" />
+                  </div>
+
+                  {/* Executive Summary */}
+                  {githubResult.summary && (
+                    <div
+                      style={{
+                        margin: '1.25rem 0',
+                        padding: '1rem 1.25rem',
+                        borderRadius: '12px',
+                        background: 'rgba(99, 102, 241, 0.08)',
+                        border: '1px solid rgba(99, 102, 241, 0.2)',
+                        color: '#cbd5e1',
+                        fontSize: '0.9rem',
+                        lineHeight: 1.6,
+                      }}
+                    >
+                      <strong style={{ color: '#a5b4fc' }}>Executive Technical Summary: </strong>
+                      {githubResult.summary}
+                    </div>
+                  )}
+
+                  {/* 4-Pillar Score Breakdown */}
+                  {githubResult.breakdown && (
+                    <div style={{ marginBottom: '1.5rem' }}>
+                      <div style={{ fontSize: '0.8rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', color: '#94a3b8', marginBottom: '10px' }}>
+                        Explainable 4-Pillar Score Breakdown
+                      </div>
+                      <div
+                        style={{
+                          display: 'grid',
+                          gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+                          gap: '12px',
+                        }}
+                      >
+                        <div style={{ background: 'rgba(255, 255, 255, 0.03)', padding: '10px 14px', borderRadius: '10px', border: '1px solid rgba(255, 255, 255, 0.06)' }}>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.8rem', marginBottom: '6px' }}>
+                            <span style={{ color: '#cbd5e1' }}>Repo Substance</span>
+                            <strong style={{ color: '#818cf8' }}>{githubResult.breakdown.repoBreadthScore}/25</strong>
+                          </div>
+                          <div style={{ width: '100%', height: '6px', background: 'rgba(255,255,255,0.08)', borderRadius: '3px', overflow: 'hidden' }}>
+                            <div style={{ width: `${(githubResult.breakdown.repoBreadthScore / 25) * 100}%`, height: '100%', background: '#818cf8', borderRadius: '3px' }} />
+                          </div>
+                        </div>
+
+                        <div style={{ background: 'rgba(255, 255, 255, 0.03)', padding: '10px 14px', borderRadius: '10px', border: '1px solid rgba(255, 255, 255, 0.06)' }}>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.8rem', marginBottom: '6px' }}>
+                            <span style={{ color: '#cbd5e1' }}>Stack & Languages</span>
+                            <strong style={{ color: '#38bdf8' }}>{githubResult.breakdown.languageMasteryScore}/25</strong>
+                          </div>
+                          <div style={{ width: '100%', height: '6px', background: 'rgba(255,255,255,0.08)', borderRadius: '3px', overflow: 'hidden' }}>
+                            <div style={{ width: `${(githubResult.breakdown.languageMasteryScore / 25) * 100}%`, height: '100%', background: '#38bdf8', borderRadius: '3px' }} />
+                          </div>
+                        </div>
+
+                        <div style={{ background: 'rgba(255, 255, 255, 0.03)', padding: '10px 14px', borderRadius: '10px', border: '1px solid rgba(255, 255, 255, 0.06)' }}>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.8rem', marginBottom: '6px' }}>
+                            <span style={{ color: '#cbd5e1' }}>Commit Velocity</span>
+                            <strong style={{ color: '#10b981' }}>{githubResult.breakdown.activityScore}/25</strong>
+                          </div>
+                          <div style={{ width: '100%', height: '6px', background: 'rgba(255,255,255,0.08)', borderRadius: '3px', overflow: 'hidden' }}>
+                            <div style={{ width: `${(githubResult.breakdown.activityScore / 25) * 100}%`, height: '100%', background: '#10b981', borderRadius: '3px' }} />
+                          </div>
+                        </div>
+
+                        <div style={{ background: 'rgba(255, 255, 255, 0.03)', padding: '10px 14px', borderRadius: '10px', border: '1px solid rgba(255, 255, 255, 0.06)' }}>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.8rem', marginBottom: '6px' }}>
+                            <span style={{ color: '#cbd5e1' }}>Rigor & Live Demos</span>
+                            <strong style={{ color: '#f59e0b' }}>{githubResult.breakdown.documentationScore}/25</strong>
+                          </div>
+                          <div style={{ width: '100%', height: '6px', background: 'rgba(255,255,255,0.08)', borderRadius: '3px', overflow: 'hidden' }}>
+                            <div style={{ width: `${(githubResult.breakdown.documentationScore / 25) * 100}%`, height: '100%', background: '#f59e0b', borderRadius: '3px' }} />
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* 4 Core Metrics Cards */}
+                  <div
+                    style={{
+                      display: 'grid',
+                      gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))',
+                      gap: '10px',
+                      marginBottom: '1.5rem',
+                    }}
+                  >
+                    <div style={{ background: 'rgba(255, 255, 255, 0.02)', border: '1px solid rgba(255, 255, 255, 0.06)', borderRadius: '12px', padding: '12px', textAlign: 'center' }}>
+                      <div style={{ fontSize: '1.25rem', fontWeight: 800, color: '#f8fafc' }}>
+                        {githubResult.metrics?.originalRepos ?? githubResult.publicRepos}
+                      </div>
+                      <div style={{ fontSize: '0.75rem', color: '#94a3b8' }}>Original Repos</div>
                     </div>
 
-                    <div style={{ marginTop: '8px', display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
-                      {githubResult.technicalStrengths?.map((t: string) => (
-                        <span key={t} className="badge badge-neutral" style={{ fontSize: '0.725rem' }}>
-                          {t}
+                    <div style={{ background: 'rgba(255, 255, 255, 0.02)', border: '1px solid rgba(255, 255, 255, 0.06)', borderRadius: '12px', padding: '12px', textAlign: 'center' }}>
+                      <div style={{ fontSize: '1.25rem', fontWeight: 800, color: '#38bdf8' }}>
+                        {githubResult.metrics?.recentPushes90d ?? (githubResult.recentActivityLevel === 'High' ? '10+' : 'Active')}
+                      </div>
+                      <div style={{ fontSize: '0.75rem', color: '#94a3b8' }}>Recent Pushes (90d)</div>
+                    </div>
+
+                    <div style={{ background: 'rgba(255, 255, 255, 0.02)', border: '1px solid rgba(255, 255, 255, 0.06)', borderRadius: '12px', padding: '12px', textAlign: 'center' }}>
+                      <div style={{ fontSize: '1.25rem', fontWeight: 800, color: '#10b981' }}>
+                        {githubResult.metrics?.deployedProjectsCount ?? 0}
+                      </div>
+                      <div style={{ fontSize: '0.75rem', color: '#94a3b8' }}>Live Deployed Apps</div>
+                    </div>
+
+                    <div style={{ background: 'rgba(255, 255, 255, 0.02)', border: '1px solid rgba(255, 255, 255, 0.06)', borderRadius: '12px', padding: '12px', textAlign: 'center' }}>
+                      <div style={{ fontSize: '1.25rem', fontWeight: 800, color: '#fbbf24' }}>
+                        {githubResult.metrics?.originalStars ?? githubResult.totalStars}
+                      </div>
+                      <div style={{ fontSize: '0.75rem', color: '#94a3b8' }}>Original Stars</div>
+                    </div>
+                  </div>
+
+                  {/* Showcase Repositories */}
+                  {githubResult.showcaseRepos && githubResult.showcaseRepos.length > 0 && (
+                    <div style={{ marginBottom: '1.5rem' }}>
+                      <div style={{ fontSize: '0.8rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', color: '#94a3b8', marginBottom: '10px' }}>
+                        Top Showcase Repositories
+                      </div>
+                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '10px' }}>
+                        {githubResult.showcaseRepos.map((repo: any) => (
+                          <div
+                            key={repo.name}
+                            style={{
+                              background: 'rgba(255, 255, 255, 0.03)',
+                              border: '1px solid rgba(255, 255, 255, 0.07)',
+                              borderRadius: '12px',
+                              padding: '12px 14px',
+                            }}
+                          >
+                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '4px' }}>
+                              <a
+                                href={repo.repoUrl}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                style={{ fontWeight: 700, color: '#f8fafc', fontSize: '0.9rem', textDecoration: 'none' }}
+                              >
+                                {repo.name}
+                              </a>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '0.75rem', color: '#94a3b8' }}>
+                                {repo.stars > 0 && (
+                                  <span style={{ display: 'flex', alignItems: 'center', gap: '2px', color: '#fbbf24' }}>
+                                    <Star size={12} fill="#fbbf24" /> {repo.stars}
+                                  </span>
+                                )}
+                                {repo.language && (
+                                  <span className="badge badge-neutral" style={{ fontSize: '0.7rem' }}>
+                                    {repo.language}
+                                  </span>
+                                )}
+                              </div>
+                            </div>
+                            {repo.description && (
+                              <p style={{ margin: '4px 0 8px', fontSize: '0.8rem', color: '#94a3b8', lineHeight: 1.4 }}>
+                                {repo.description.length > 80 ? repo.description.slice(0, 80) + '...' : repo.description}
+                              </p>
+                            )}
+                            {repo.liveUrl && (
+                              <a
+                                href={repo.liveUrl}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                style={{
+                                  display: 'inline-flex',
+                                  alignItems: 'center',
+                                  gap: '4px',
+                                  fontSize: '0.72rem',
+                                  color: '#38bdf8',
+                                  textDecoration: 'none',
+                                }}
+                              >
+                                <Globe size={12} /> Live Demonstration →
+                              </a>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Highlights & Growth Areas */}
+                  <div
+                    style={{
+                      display: 'grid',
+                      gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))',
+                      gap: '12px',
+                      marginBottom: '1.25rem',
+                    }}
+                  >
+                    {/* Highlights */}
+                    {githubResult.highlights && githubResult.highlights.length > 0 && (
+                      <div
+                        style={{
+                          background: 'rgba(16, 185, 129, 0.05)',
+                          border: '1px solid rgba(16, 185, 129, 0.2)',
+                          borderRadius: '12px',
+                          padding: '12px 16px',
+                        }}
+                      >
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.8rem', fontWeight: 700, color: '#34d399', marginBottom: '8px' }}>
+                          <CheckCircle2 size={15} /> Verified Strengths
+                        </div>
+                        <ul style={{ margin: 0, paddingLeft: '1.2rem', fontSize: '0.8rem', color: '#cbd5e1', lineHeight: 1.6 }}>
+                          {githubResult.highlights.map((h: string, i: number) => (
+                            <li key={i}>{h}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+
+                    {/* Growth Areas */}
+                    {githubResult.growthAreas && githubResult.growthAreas.length > 0 && (
+                      <div
+                        style={{
+                          background: 'rgba(245, 158, 11, 0.05)',
+                          border: '1px solid rgba(245, 158, 11, 0.2)',
+                          borderRadius: '12px',
+                          padding: '12px 16px',
+                        }}
+                      >
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.8rem', fontWeight: 700, color: '#fbbf24', marginBottom: '8px' }}>
+                          <AlertCircle size={15} /> Growth Opportunities
+                        </div>
+                        <ul style={{ margin: 0, paddingLeft: '1.2rem', fontSize: '0.8rem', color: '#cbd5e1', lineHeight: 1.6 }}>
+                          {githubResult.growthAreas.map((g: string, i: number) => (
+                            <li key={i}>{g}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Languages & Frameworks Chips */}
+                  <div>
+                    <div style={{ fontSize: '0.75rem', color: '#94a3b8', marginBottom: '6px' }}>Detected Languages & Technologies:</div>
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
+                      {githubResult.topLanguages?.map((l: any) => (
+                        <span key={l.name} className="badge badge-primary" style={{ fontSize: '0.725rem' }}>
+                          {l.name} ({l.percentage}%)
+                        </span>
+                      ))}
+                      {githubResult.detectedFrameworks?.map((f: string) => (
+                        <span key={f} className="badge badge-neutral" style={{ fontSize: '0.725rem' }}>
+                          {f}
                         </span>
                       ))}
                     </div>
                   </div>
-
-                  <ScoreRing score={githubResult.score} size={88} label="GitHub Score" />
                 </motion.div>
               )}
 

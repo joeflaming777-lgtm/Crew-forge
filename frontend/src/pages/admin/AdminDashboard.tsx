@@ -178,7 +178,7 @@ export const AdminDashboard: React.FC = () => {
         </div>
         <div>
           <h1 style={{ fontSize: '2rem', fontWeight: 800, color: '#f8fafc', letterSpacing: '-0.02em' }}>
-            HackMate Administration Console
+            SkillSync Administration Console
           </h1>
           <p style={{ color: '#94a3b8', fontSize: '0.95rem' }}>
             Manage platform users, scoring models, and technical question bank

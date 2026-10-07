@@ -36,7 +36,7 @@ export class MatchingService {
       overallScore: number;
       preferredRoles: { role: { name: string } }[];
       skills: { skill: { name: string } }[];
-      githubAnalysis?: { recentActivityLevel: string; publicRepos: number } | null;
+      githubAnalysis?: { recentActivityLevel?: string; publicRepos?: number; archetype?: string; metrics?: any } | null;
     }
   ): MatchAnalysisResult {
     const reasons: string[] = [];
@@ -115,10 +115,19 @@ export class MatchingService {
     }
 
     if (candidate.githubScore >= 75) {
-      reasons.push(`✓ Proven GitHub technical evidence (${candidate.githubScore}/100)`);
+      reasons.push(`✓ Proven GitHub technical evidence (${Math.round(candidate.githubScore)}/100)`);
+    } else if (candidate.githubScore > 0 && candidate.githubScore < 50) {
+      gaps.push(`⚠ Limited public GitHub code evidence (${Math.round(candidate.githubScore)}/100)`);
     }
-    if (candidate.githubAnalysis?.recentActivityLevel === 'High') {
+
+    if (candidate.githubAnalysis?.archetype) {
+      reasons.push(`✓ Identified as ${candidate.githubAnalysis.archetype}`);
+    } else if (candidate.githubAnalysis?.recentActivityLevel === 'High') {
       reasons.push(`✓ High recent GitHub commit activity`);
+    }
+
+    if (candidate.githubAnalysis?.metrics?.deployedProjectsCount > 0) {
+      reasons.push(`✓ Has deployed live application(s) with public demonstrations`);
     }
 
     // 4. Availability

@@ -15,6 +15,9 @@ import {
   X,
   ExternalLink,
   ChevronDown,
+  Star,
+  Globe,
+  CheckCircle2,
 } from 'lucide-react';
 import { apiClient } from '../../api/client';
 import { useToast } from '../../contexts/ToastContext';
@@ -483,22 +486,203 @@ export const LeaderDiscovery: React.FC = () => {
 
             {/* GitHub Technical Evidence */}
             {selectedCandidate.githubAnalysis && (
-              <div style={{ padding: '1.25rem', borderRadius: '14px', background: 'rgba(255, 255, 255, 0.03)', border: '1px solid rgba(255, 255, 255, 0.08)' }}>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <Github size={18} color="#fff" />
-                    <span style={{ fontWeight: 700, color: '#f8fafc' }}>
-                      GitHub: @{selectedCandidate.githubAnalysis.username}
-                    </span>
+              <div
+                style={{
+                  padding: '1.5rem',
+                  borderRadius: '16px',
+                  background: 'linear-gradient(145deg, rgba(30, 41, 59, 0.6), rgba(15, 23, 42, 0.8))',
+                  border: '1px solid rgba(99, 102, 241, 0.25)',
+                }}
+              >
+                {/* Header */}
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '8px', marginBottom: '12px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                    <div
+                      style={{
+                        width: '36px',
+                        height: '36px',
+                        borderRadius: '10px',
+                        background: 'rgba(99, 102, 241, 0.15)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        border: '1px solid rgba(99, 102, 241, 0.3)',
+                      }}
+                    >
+                      <Github size={20} color="#818cf8" />
+                    </div>
+                    <div>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        <span style={{ fontWeight: 800, color: '#f8fafc', fontSize: '1rem' }}>
+                          @{selectedCandidate.githubAnalysis.username}
+                        </span>
+                        <a
+                          href={selectedCandidate.githubAnalysis.profileUrl || `https://github.com/${selectedCandidate.githubAnalysis.username}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          style={{ color: '#94a3b8', display: 'flex' }}
+                        >
+                          <ExternalLink size={13} />
+                        </a>
+                        {selectedCandidate.githubAnalysis.archetype && (
+                          <span
+                            className="badge"
+                            style={{
+                              background: 'rgba(99, 102, 241, 0.25)',
+                              color: '#a5b4fc',
+                              border: '1px solid rgba(99, 102, 241, 0.4)',
+                              fontSize: '0.7rem',
+                              fontWeight: 700,
+                            }}
+                          >
+                            {selectedCandidate.githubAnalysis.archetype}
+                          </span>
+                        )}
+                      </div>
+                    </div>
                   </div>
-                  <span className="badge badge-primary">Score: {selectedCandidate.githubAnalysis.score}/100</span>
+                  <span className="badge badge-primary" style={{ fontSize: '0.8rem', padding: '4px 10px' }}>
+                    GitHub Score: {selectedCandidate.githubAnalysis.score}/100
+                  </span>
                 </div>
 
-                <div style={{ fontSize: '0.85rem', color: '#94a3b8', lineHeight: 1.6 }}>
-                  Public Repos: <strong style={{ color: '#fff' }}>{selectedCandidate.githubAnalysis.publicRepos}</strong> • Recent Activity: <strong style={{ color: '#fff' }}>{selectedCandidate.githubAnalysis.recentActivityLevel}</strong> • README: <strong style={{ color: '#fff' }}>{selectedCandidate.githubAnalysis.readmeCoverage}</strong>
+                {/* Summary */}
+                {selectedCandidate.githubAnalysis.summary && (
+                  <p
+                    style={{
+                      margin: '0 0 12px',
+                      fontSize: '0.85rem',
+                      color: '#cbd5e1',
+                      lineHeight: 1.5,
+                      padding: '10px 12px',
+                      borderRadius: '10px',
+                      background: 'rgba(255, 255, 255, 0.02)',
+                      border: '1px solid rgba(255, 255, 255, 0.05)',
+                    }}
+                  >
+                    {selectedCandidate.githubAnalysis.summary}
+                  </p>
+                )}
+
+                {/* 4-Pillar Breakdown Bars */}
+                {selectedCandidate.githubAnalysis.breakdown && (
+                  <div
+                    style={{
+                      display: 'grid',
+                      gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))',
+                      gap: '8px',
+                      marginBottom: '12px',
+                    }}
+                  >
+                    <div style={{ background: 'rgba(255,255,255,0.02)', padding: '8px 10px', borderRadius: '8px' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.7rem', marginBottom: '4px' }}>
+                        <span style={{ color: '#94a3b8' }}>Repo Substance</span>
+                        <strong style={{ color: '#818cf8' }}>{selectedCandidate.githubAnalysis.breakdown.repoBreadthScore}/25</strong>
+                      </div>
+                      <div style={{ width: '100%', height: '4px', background: 'rgba(255,255,255,0.06)', borderRadius: '2px' }}>
+                        <div style={{ width: `${(selectedCandidate.githubAnalysis.breakdown.repoBreadthScore / 25) * 100}%`, height: '100%', background: '#818cf8', borderRadius: '2px' }} />
+                      </div>
+                    </div>
+
+                    <div style={{ background: 'rgba(255,255,255,0.02)', padding: '8px 10px', borderRadius: '8px' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.7rem', marginBottom: '4px' }}>
+                        <span style={{ color: '#94a3b8' }}>Stack Breadth</span>
+                        <strong style={{ color: '#38bdf8' }}>{selectedCandidate.githubAnalysis.breakdown.languageMasteryScore}/25</strong>
+                      </div>
+                      <div style={{ width: '100%', height: '4px', background: 'rgba(255,255,255,0.06)', borderRadius: '2px' }}>
+                        <div style={{ width: `${(selectedCandidate.githubAnalysis.breakdown.languageMasteryScore / 25) * 100}%`, height: '100%', background: '#38bdf8', borderRadius: '2px' }} />
+                      </div>
+                    </div>
+
+                    <div style={{ background: 'rgba(255,255,255,0.02)', padding: '8px 10px', borderRadius: '8px' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.7rem', marginBottom: '4px' }}>
+                        <span style={{ color: '#94a3b8' }}>Commit Velocity</span>
+                        <strong style={{ color: '#10b981' }}>{selectedCandidate.githubAnalysis.breakdown.activityScore}/25</strong>
+                      </div>
+                      <div style={{ width: '100%', height: '4px', background: 'rgba(255,255,255,0.06)', borderRadius: '2px' }}>
+                        <div style={{ width: `${(selectedCandidate.githubAnalysis.breakdown.activityScore / 25) * 100}%`, height: '100%', background: '#10b981', borderRadius: '2px' }} />
+                      </div>
+                    </div>
+
+                    <div style={{ background: 'rgba(255,255,255,0.02)', padding: '8px 10px', borderRadius: '8px' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.7rem', marginBottom: '4px' }}>
+                        <span style={{ color: '#94a3b8' }}>Rigor & Demos</span>
+                        <strong style={{ color: '#f59e0b' }}>{selectedCandidate.githubAnalysis.breakdown.documentationScore}/25</strong>
+                      </div>
+                      <div style={{ width: '100%', height: '4px', background: 'rgba(255,255,255,0.06)', borderRadius: '2px' }}>
+                        <div style={{ width: `${(selectedCandidate.githubAnalysis.breakdown.documentationScore / 25) * 100}%`, height: '100%', background: '#f59e0b', borderRadius: '2px' }} />
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Core Stats Row */}
+                <div style={{ display: 'flex', gap: '16px', fontSize: '0.8rem', color: '#94a3b8', flexWrap: 'wrap', marginBottom: '12px' }}>
+                  <span>
+                    Original Repos: <strong style={{ color: '#fff' }}>{selectedCandidate.githubAnalysis.metrics?.originalRepos ?? selectedCandidate.githubAnalysis.publicRepos}</strong>
+                  </span>
+                  <span>
+                    Stars: <strong style={{ color: '#fbbf24' }}>{selectedCandidate.githubAnalysis.metrics?.originalStars ?? selectedCandidate.githubAnalysis.totalStars} ★</strong>
+                  </span>
+                  <span>
+                    Recent Activity: <strong style={{ color: '#10b981' }}>{selectedCandidate.githubAnalysis.recentActivityLevel}</strong>
+                  </span>
+                  {selectedCandidate.githubAnalysis.metrics?.deployedProjectsCount ? (
+                    <span>
+                      Live Demos: <strong style={{ color: '#38bdf8' }}>{selectedCandidate.githubAnalysis.metrics.deployedProjectsCount}</strong>
+                    </span>
+                  ) : null}
                 </div>
 
-                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginTop: '8px' }}>
+                {/* Showcase Repositories */}
+                {selectedCandidate.githubAnalysis.showcaseRepos && selectedCandidate.githubAnalysis.showcaseRepos.length > 0 && (
+                  <div style={{ marginBottom: '12px' }}>
+                    <div style={{ fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase', color: '#94a3b8', marginBottom: '6px' }}>
+                      Key Showcase Projects:
+                    </div>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '8px' }}>
+                      {selectedCandidate.githubAnalysis.showcaseRepos.slice(0, 2).map((repo: any) => (
+                        <div
+                          key={repo.name}
+                          style={{
+                            background: 'rgba(255, 255, 255, 0.03)',
+                            padding: '8px 10px',
+                            borderRadius: '8px',
+                            border: '1px solid rgba(255, 255, 255, 0.05)',
+                          }}
+                        >
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                            <a
+                              href={repo.repoUrl}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              style={{ fontWeight: 700, color: '#f8fafc', fontSize: '0.8rem', textDecoration: 'none' }}
+                            >
+                              {repo.name}
+                            </a>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.7rem', color: '#94a3b8' }}>
+                              {repo.stars > 0 && <span style={{ color: '#fbbf24' }}>★ {repo.stars}</span>}
+                              {repo.language && <span className="badge badge-neutral" style={{ fontSize: '0.65rem' }}>{repo.language}</span>}
+                            </div>
+                          </div>
+                          {repo.liveUrl && (
+                            <a
+                              href={repo.liveUrl}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', fontSize: '0.7rem', color: '#38bdf8', marginTop: '4px', textDecoration: 'none' }}
+                            >
+                              <Globe size={11} /> Live Demo →
+                            </a>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Technical Strengths */}
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
                   {selectedCandidate.githubAnalysis.technicalStrengths?.map((s) => (
                     <span key={s} className="badge badge-neutral" style={{ fontSize: '0.725rem' }}>
                       {s}

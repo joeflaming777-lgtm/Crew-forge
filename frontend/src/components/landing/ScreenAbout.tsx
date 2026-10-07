@@ -84,7 +84,7 @@ export const ScreenAbout: React.FC = () => {
               marginBottom: '1.25rem',
             }}
           >
-            Why HackMate?
+            Why SkillSync?
           </motion.h2>
 
           {/* Problem Statement */}
@@ -118,7 +118,7 @@ export const ScreenAbout: React.FC = () => {
               margin: '0 auto',
             }}
           >
-            HackMate provides a structured way to discover, evaluate and connect suitable teammates using student profiles, verified skills, personalized assessments, GitHub code analysis, explainable match scores, and invitation-based joining.
+            SkillSync provides a structured way to discover, evaluate and connect suitable teammates using student profiles, verified skills, personalized assessments, GitHub code analysis, explainable match scores, and invitation-based joining.
           </motion.p>
         </div>
 
