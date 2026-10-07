@@ -27,7 +27,7 @@ export const ScreenAbout: React.FC = () => {
     },
     {
       title: 'Build',
-      description: 'Team Leaders select candidates and send invitations.',
+      description: 'Team Owners select candidates and send invitations.',
       icon: <Users size={28} color="#f59e0b" />,
       glowColor: 'rgba(245, 158, 11, 0.25)',
       gradient: 'linear-gradient(135deg, rgba(245, 158, 11, 0.15), rgba(239, 68, 68, 0.05))',

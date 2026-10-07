@@ -3,39 +3,40 @@ import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { UserCheck, ShieldCheck, ArrowRight, Sparkles, Key } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
-import { apiClient } from '../../api/client';
 import { useToast } from '../../contexts/ToastContext';
 
 export const ScreenChoosePath: React.FC = () => {
   const navigate = useNavigate();
-  const { login } = useAuth();
+  const { login, switchDemoUser } = useAuth();
   const toast = useToast();
 
-  const handleQuickLogin = async (role: 'candidate' | 'team_leader' | 'admin') => {
+  const handleQuickLogin = async (userKey: 'arjun' | 'priya' | 'aarav', targetIntent?: string) => {
     try {
-      let endpoint = '/auth/candidate/login';
-      let payload = { email: 'candidate@skillsync.dev', password: 'candidate123' };
+      const emailMap = {
+        arjun: 'arjun@hackmate.dev',
+        priya: 'priya@hackmate.dev',
+        aarav: 'aarav@hackmate.dev',
+      };
 
-      if (role === 'team_leader') {
-        endpoint = '/auth/leader/login';
-        payload = { email: 'leader@skillsync.dev', password: 'leader123' };
-      } else if (role === 'admin') {
-        endpoint = '/auth/admin/login';
-        payload = { email: 'admin@skillsync.dev', password: 'admin123' };
+      const nameMap = {
+        arjun: 'Arjun Sharma',
+        priya: 'Priya Patel',
+        aarav: 'Aarav Mehta',
+      };
+
+      toast.info(`Logging in as ${nameMap[userKey]}...`);
+      await login(emailMap[userKey]);
+      toast.success(`Welcome back, ${nameMap[userKey]}!`);
+
+      if (targetIntent === 'find-team') {
+        navigate('/find-team');
+      } else if (targetIntent === 'build-team') {
+        navigate('/build-team');
+      } else {
+        navigate('/dashboard');
       }
-
-      toast.info(`Logging in as Demo ${role.replace('_', ' ')}...`);
-      const res = await apiClient.post(endpoint, payload);
-
-      if (res.data.success) {
-        login(res.data.token, res.data.user);
-        toast.success(`Logged in as Demo ${role.replace('_', ' ')}!`);
-        if (role === 'candidate') navigate('/candidate/dashboard');
-        else if (role === 'team_leader') navigate('/leader/dashboard');
-        else navigate('/admin');
-      }
-    } catch (err: any) {
-      toast.error(err.response?.data?.message || 'Login failed');
+    } catch {
+      toast.error('Quick login failed.');
     }
   };
 
@@ -80,7 +81,7 @@ export const ScreenChoosePath: React.FC = () => {
               color: '#94a3b8',
             }}
           >
-            How are you joining SkillSync?
+            One student account. Endless hackathon possibilities.
           </motion.p>
         </div>
 
@@ -93,7 +94,7 @@ export const ScreenChoosePath: React.FC = () => {
             marginBottom: '3rem',
           }}
         >
-          {/* Candidate Card */}
+          {/* Find a Team Card */}
           <motion.div
             initial={{ opacity: 0, x: -30 }}
             whileInView={{ opacity: 1, x: 0 }}
@@ -144,7 +145,7 @@ export const ScreenChoosePath: React.FC = () => {
                   marginBottom: '0.5rem',
                 }}
               >
-                <Sparkles size={14} /> For Students & Hackers
+                <Sparkles size={14} /> Looking to Join a Squad
               </div>
 
               <h3
@@ -167,13 +168,13 @@ export const ScreenChoosePath: React.FC = () => {
                   marginBottom: '2rem',
                 }}
               >
-                Create your profile, prove your skills and discover opportunities to join the right team.
+                Create your student profile, verify your skills, and discover hackathon teams looking for your expertise.
               </p>
             </div>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
               <button
-                onClick={() => navigate('/candidate/login')}
+                onClick={() => navigate('/login?intent=find-team')}
                 className="btn-primary"
                 style={{
                   width: '100%',
@@ -181,22 +182,22 @@ export const ScreenChoosePath: React.FC = () => {
                   fontSize: '1.05rem',
                 }}
               >
-                Candidate Portal <ArrowRight size={20} />
+                Find a Team <ArrowRight size={20} />
               </button>
 
               <div style={{ display: 'flex', justifyContent: 'center', gap: '1rem', fontSize: '0.85rem' }}>
-                <span style={{ color: '#64748b' }}>New candidate?</span>
+                <span style={{ color: '#64748b' }}>New student?</span>
                 <button
-                  onClick={() => navigate('/candidate/register')}
+                  onClick={() => navigate('/register?intent=find-team')}
                   style={{ color: '#818cf8', fontWeight: 600 }}
                 >
-                  Create Profile
+                  Create Student Profile
                 </button>
               </div>
             </div>
           </motion.div>
 
-          {/* Team Leader Card */}
+          {/* Build a Team Card */}
           <motion.div
             initial={{ opacity: 0, x: 30 }}
             whileInView={{ opacity: 1, x: 0 }}
@@ -247,7 +248,7 @@ export const ScreenChoosePath: React.FC = () => {
                   marginBottom: '0.5rem',
                 }}
               >
-                <Sparkles size={14} /> For Team Creators & Leads
+                <Sparkles size={14} /> Leading or Forming a Squad
               </div>
 
               <h3
@@ -270,13 +271,13 @@ export const ScreenChoosePath: React.FC = () => {
                   marginBottom: '2rem',
                 }}
               >
-                Create your team, discover candidates and select the right people for your hackathon.
+                Create your team, discover verified student candidates, and invite the right people for your hackathon.
               </p>
             </div>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
               <button
-                onClick={() => navigate('/leader/login')}
+                onClick={() => navigate('/login?intent=build-team')}
                 className="btn-primary"
                 style={{
                   width: '100%',
@@ -286,23 +287,23 @@ export const ScreenChoosePath: React.FC = () => {
                   boxShadow: '0 4px 15px rgba(6, 182, 212, 0.35)',
                 }}
               >
-                Team Leader Portal <ArrowRight size={20} />
+                Build a Team <ArrowRight size={20} />
               </button>
 
               <div style={{ display: 'flex', justifyContent: 'center', gap: '1rem', fontSize: '0.85rem' }}>
-                <span style={{ color: '#64748b' }}>New leader?</span>
+                <span style={{ color: '#64748b' }}>New student?</span>
                 <button
-                  onClick={() => navigate('/leader/register')}
+                  onClick={() => navigate('/register?intent=build-team')}
                   style={{ color: '#2dd4bf', fontWeight: 600 }}
                 >
-                  Register as Leader
+                  Create Student Profile
                 </button>
               </div>
             </div>
           </motion.div>
         </div>
 
-        {/* 1-Click Demo Accounts Quick Bar for instantaneous grading and testing */}
+        {/* 1-Click Instant Demo Login Bar */}
         <div
           style={{
             background: 'rgba(255, 255, 255, 0.03)',
@@ -319,31 +320,31 @@ export const ScreenChoosePath: React.FC = () => {
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
             <Key size={18} color="#f59e0b" />
             <span style={{ fontSize: '0.9rem', color: '#cbd5e1', fontWeight: 500 }}>
-              Instant 1-Click Evaluation Login:
+              1-Click Demo Student Accounts:
             </span>
           </div>
 
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
             <button
-              onClick={() => handleQuickLogin('candidate')}
+              onClick={() => handleQuickLogin('arjun', 'find-team')}
               className="btn-secondary btn-sm"
               style={{ fontSize: '0.825rem' }}
             >
-              Demo Candidate (Arjun)
+              Arjun Sharma (Owner & Member)
             </button>
             <button
-              onClick={() => handleQuickLogin('team_leader')}
+              onClick={() => handleQuickLogin('priya', 'find-team')}
               className="btn-secondary btn-sm"
               style={{ fontSize: '0.825rem' }}
             >
-              Demo Leader (Aarav - NeuralNomads)
+              Priya Patel (Looking for Team)
             </button>
             <button
-              onClick={() => handleQuickLogin('admin')}
+              onClick={() => handleQuickLogin('aarav', 'build-team')}
               className="btn-secondary btn-sm"
               style={{ fontSize: '0.825rem' }}
             >
-              Admin Portal
+              Aarav Mehta (Team Owner)
             </button>
           </div>
         </div>

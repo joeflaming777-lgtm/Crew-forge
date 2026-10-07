@@ -1,12 +1,4 @@
-export type UserRole = 'candidate' | 'team_leader' | 'admin';
-
-export interface User {
-  id: string;
-  email: string;
-  role: UserRole;
-  candidateProfile?: CandidateProfile;
-  leaderProfile?: LeaderProfile;
-}
+export type ContextualRole = 'Looking for a Team' | 'Team Owner' | 'Team Member';
 
 export interface Skill {
   id: string;
@@ -86,9 +78,48 @@ export interface GitHubAnalysis {
   analyzedAt?: string;
 }
 
-export interface CandidateProfile {
+export interface QuizTopicScore {
+  topic: string;
+  score: number;
+}
+
+export interface QuizResult {
+  score: number;
+  roleName: string;
+  completedAt: string;
+  totalQuestions: number;
+  correctQuestions: number;
+  topicBreakdown?: QuizTopicScore[];
+  answers?: Record<string, string>;
+}
+
+export interface ProjectItem {
   id: string;
-  userId: string;
+  title: string;
+  description: string;
+  techStack: string[];
+  liveUrl?: string;
+  repoUrl?: string;
+}
+
+export interface VerificationSteps {
+  profile: boolean;
+  skills: boolean;
+  roles: boolean;
+  github: boolean;
+  githubAnalysis: boolean;
+  quiz: boolean;
+  quizResult: boolean;
+}
+
+/**
+ * SINGLE USER / STUDENT MODEL
+ * Every student creates one account and one profile.
+ * The same student can find a team and build a team simultaneously.
+ */
+export interface User {
+  id: string;
+  email: string;
   fullName: string;
   avatarUrl?: string;
   phone?: string;
@@ -99,84 +130,67 @@ export interface CandidateProfile {
   bio?: string;
   availability: 'Available' | 'Busy' | 'Committed';
   hackathonsCount: number;
-  projects?: string | any[];
-  achievements?: string | any[];
-  certifications?: string | any[];
-  previousExperience?: string;
-  preferredCategories?: string | any[];
-  profileCompleted: boolean;
-  overallScore: number;
+  skills: { id: string; name: string; category: string; proficiency?: string }[];
+  preferredRoles: { id: string; name: string; category?: string; isPrimary: boolean }[];
+  projects: ProjectItem[];
+  achievements: string[];
+  hackathonExperience: string;
+  githubUsername?: string;
+  githubAnalysis?: GitHubAnalysis | null;
+  quizResults?: QuizResult | null;
+  overallSkillScore: number;
   quizScore: number;
   githubScore: number;
   skillMatchScore: number;
   experienceScore: number;
-  skills?: { id: string; skill: Skill; proficiency?: string }[];
-  preferredRoles?: { id: string; role: Role; isPrimary: boolean }[];
-  githubAnalysis?: GitHubAnalysis;
-  teamMemberships?: any[];
-  invitations?: any[];
+  linkedIn?: string;
+  isActivated: boolean;
+  completionPercentage: number;
+  verificationSteps: VerificationSteps;
+  
+  // Backward compatibility aliases if needed
+  role?: string;
+  candidateProfile?: any;
+  leaderProfile?: any;
 }
 
-export interface LeaderProfile {
+export interface TeamMember {
   id: string;
   userId: string;
   fullName: string;
+  email: string;
   avatarUrl?: string;
-  college: string;
-  department: string;
-  year: number;
-  bio?: string;
-  teams?: Team[];
-}
-
-export interface Hackathon {
-  id: string;
-  name: string;
-  slug: string;
-  description: string;
-  organizer: string;
-  registrationDeadline: string;
-  minTeamSize: number;
-  maxTeamSize: number;
-  rules?: string;
-  bannerUrl?: string;
-  problemStatements?: { id: string; title: string; category: string }[];
-  status: string;
-  totalTeams?: number;
-}
-
-export interface TeamRequirement {
-  id?: string;
-  roleName: string;
-  skillNames?: string;
-  neededCount?: number;
-  filledCount?: number;
-  isRequired?: boolean;
+  assignedRole: string;
+  isOwner: boolean;
+  joinedAt: string;
+  department?: string;
+  year?: number;
+  overallScore?: number;
+  skills?: string[];
 }
 
 export interface Team {
   id: string;
   name: string;
+  hackathonName: string;
+  hackathonId?: string;
   description: string;
-  hackathonId: string;
-  hackathon?: Hackathon;
-  leaderProfileId: string;
-  leader?: LeaderProfile;
+  ownerId: string;
+  ownerName: string;
+  ownerEmail: string;
+  ownerAvatar?: string;
   maxTeamSize: number;
+  currentMemberCount: number;
   minCandidateScore: number;
+  requiredRoles: string[];
+  requiredSkills: string[];
+  optionalRequirements?: string;
   preferredDept?: string;
   availabilityReq?: string;
-  status: string;
-  requirements?: TeamRequirement[];
-  members?: {
-    id: string;
-    candidateProfileId: string;
-    assignedRole: string;
-    joinedAt: string;
-    candidate: CandidateProfile;
-  }[];
-  openRoles?: string[];
-  currentMemberCount?: number;
+  status: 'Recruiting' | 'Full' | 'Complete';
+  members: TeamMember[];
+  openRoles: string[];
+  createdAt: string;
 }
 
 export interface MatchAnalysis {
@@ -198,6 +212,7 @@ export interface MatchAnalysis {
 export interface EnrichedCandidate {
   id: string;
   fullName: string;
+  email: string;
   avatarUrl?: string;
   college: string;
   department: string;
@@ -212,22 +227,27 @@ export interface EnrichedCandidate {
   experienceScore: number;
   skillMatchScore: number;
   skills: { id: string; name: string; category: string; proficiency?: string }[];
-  preferredRoles: { id: string; name: string; isPrimary: boolean }[];
+  preferredRoles: { id: string; name: string; category?: string; isPrimary: boolean }[];
+  projects?: ProjectItem[];
   githubAnalysis?: GitHubAnalysis | null;
   matchAnalysis: MatchAnalysis;
+  isActivated: boolean;
+  completionPercentage: number;
   invitationStatus?: string | null;
-  invitationRole?: string | null;
+  isMemberOfTeam?: boolean;
   isMemberOfCurrentTeam?: boolean;
 }
 
 export interface Invitation {
   id: string;
   teamId: string;
-  team: Team;
-  candidateProfileId: string;
-  candidate?: CandidateProfile;
-  leaderProfileId: string;
-  leader?: LeaderProfile;
+  teamName: string;
+  hackathonName: string;
+  ownerId: string;
+  ownerName: string;
+  candidateId: string;
+  candidateName: string;
+  candidateEmail: string;
   roleName: string;
   message?: string;
   status: 'PENDING' | 'ACCEPTED' | 'DECLINED' | 'CANCELLED';
@@ -237,10 +257,20 @@ export interface Invitation {
 
 export interface Notification {
   id: string;
+  userId: string;
   title: string;
   message: string;
-  type: string;
+  type: 'INVITATION' | 'TEAM_UPDATE' | 'SELECTION_UPDATE' | 'SYSTEM';
   link?: string;
   isRead: boolean;
   createdAt: string;
+}
+
+export interface QuizQuestion {
+  id: string;
+  question: string;
+  options: { id: string; text: string }[];
+  correctOptionId: string;
+  topic: string;
+  explanation: string;
 }

@@ -4,49 +4,35 @@ import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { ToastProvider } from './contexts/ToastContext';
 import { Navbar } from './components/common/Navbar';
 
-// Pages
+// Landing & Auth Pages
 import { LandingPage } from './pages/LandingPage';
-import { CandidateLogin } from './pages/auth/CandidateLogin';
-import { CandidateRegister } from './pages/auth/CandidateRegister';
-import { LeaderLogin } from './pages/auth/LeaderLogin';
-import { LeaderRegister } from './pages/auth/LeaderRegister';
-import { AdminLogin } from './pages/auth/AdminLogin';
+import { LoginPage } from './pages/auth/LoginPage';
+import { RegisterPage } from './pages/auth/RegisterPage';
 
-import { CandidateDashboard } from './pages/candidate/CandidateDashboard';
-import { CandidateOnboarding } from './pages/candidate/CandidateOnboarding';
-import { CandidateQuiz } from './pages/candidate/CandidateQuiz';
-import { CandidateQuizResult } from './pages/candidate/CandidateQuizResult';
-import { CandidateBrowseTeams } from './pages/candidate/CandidateBrowseTeams';
-import { CandidateMyTeam } from './pages/candidate/CandidateMyTeam';
-import { CandidateInvitations } from './pages/candidate/CandidateInvitations';
+// User / Student Pages
+import { UserDashboard } from './pages/dashboard/UserDashboard';
+import { UserProfileView } from './pages/profile/UserProfileView';
+import { UserProfileEdit } from './pages/profile/UserProfileEdit';
+import { GitHubVerificationPage } from './pages/verification/GitHubVerificationPage';
+import { PersonalizedQuizPage } from './pages/verification/PersonalizedQuizPage';
+import { QuizResultPage } from './pages/verification/QuizResultPage';
+import { FindTeamPage } from './pages/teams/FindTeamPage';
+import { TeamDetailPage } from './pages/teams/TeamDetailPage';
+import { InvitationsPage } from './pages/invitations/InvitationsPage';
+import { MyTeamsPage } from './pages/teams/MyTeamsPage';
 
-import { LeaderDashboard } from './pages/leader/LeaderDashboard';
-import { LeaderCreateTeam } from './pages/leader/LeaderCreateTeam';
-import { LeaderDiscovery } from './pages/leader/LeaderDiscovery';
-import { LeaderTeamBuilder } from './pages/leader/LeaderTeamBuilder';
-import { LeaderInvitations } from './pages/leader/LeaderInvitations';
+// Team Owner Pages
+import { BuildTeamPage } from './pages/teams/BuildTeamPage';
+import { TeamOwnerDashboard } from './pages/team-owner/TeamOwnerDashboard';
+import { TeamCandidatesDiscovery } from './pages/team-owner/TeamCandidatesDiscovery';
+import { TeamOwnerInvitations } from './pages/team-owner/TeamOwnerInvitations';
+import { TeamOwnerSettings } from './pages/team-owner/TeamOwnerSettings';
 
-import { AdminDashboard } from './pages/admin/AdminDashboard';
-
-// Route Guards
-const ProtectedCandidateRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const { user, isCandidate, loading } = useAuth();
+// Unified Student Route Guard
+const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const { user, loading } = useAuth();
   if (loading) return null;
-  if (!user || !isCandidate) return <Navigate to="/candidate/login" replace />;
-  return <>{children}</>;
-};
-
-const ProtectedLeaderRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const { user, isLeader, loading } = useAuth();
-  if (loading) return null;
-  if (!user || !isLeader) return <Navigate to="/leader/login" replace />;
-  return <>{children}</>;
-};
-
-const ProtectedAdminRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const { user, isAdmin, loading } = useAuth();
-  if (loading) return null;
-  if (!user || !isAdmin) return <Navigate to="/admin/login" replace />;
+  if (!user) return <Navigate to="/login" replace />;
   return <>{children}</>;
 };
 
@@ -59,123 +45,164 @@ export const App: React.FC = () => {
             <Navbar />
             <main className="main-content">
               <Routes>
-                {/* Public Landing & Auth Routes */}
+                {/* PUBLIC ROUTES */}
                 <Route path="/" element={<LandingPage />} />
-                <Route path="/candidate/login" element={<CandidateLogin />} />
-                <Route path="/candidate/register" element={<CandidateRegister />} />
-                <Route path="/leader/login" element={<LeaderLogin />} />
-                <Route path="/leader/register" element={<LeaderRegister />} />
-                <Route path="/admin/login" element={<AdminLogin />} />
+                <Route path="/about" element={<LandingPage />} />
+                <Route path="/portal" element={<Navigate to="/dashboard" replace />} />
 
-                {/* Candidate Portal Routes */}
-                <Route
-                  path="/candidate/dashboard"
-                  element={
-                    <ProtectedCandidateRoute>
-                      <CandidateDashboard />
-                    </ProtectedCandidateRoute>
-                  }
-                />
-                <Route
-                  path="/candidate/onboarding"
-                  element={
-                    <ProtectedCandidateRoute>
-                      <CandidateOnboarding />
-                    </ProtectedCandidateRoute>
-                  }
-                />
-                <Route
-                  path="/candidate/quiz"
-                  element={
-                    <ProtectedCandidateRoute>
-                      <CandidateQuiz />
-                    </ProtectedCandidateRoute>
-                  }
-                />
-                <Route
-                  path="/candidate/quiz-result"
-                  element={
-                    <ProtectedCandidateRoute>
-                      <CandidateQuizResult />
-                    </ProtectedCandidateRoute>
-                  }
-                />
-                <Route
-                  path="/candidate/teams"
-                  element={
-                    <ProtectedCandidateRoute>
-                      <CandidateBrowseTeams />
-                    </ProtectedCandidateRoute>
-                  }
-                />
-                <Route
-                  path="/candidate/my-team"
-                  element={
-                    <ProtectedCandidateRoute>
-                      <CandidateMyTeam />
-                    </ProtectedCandidateRoute>
-                  }
-                />
-                <Route
-                  path="/candidate/invitations"
-                  element={
-                    <ProtectedCandidateRoute>
-                      <CandidateInvitations />
-                    </ProtectedCandidateRoute>
-                  }
-                />
+                {/* SINGLE AUTHENTICATION ROUTES */}
+                <Route path="/login" element={<LoginPage />} />
+                <Route path="/register" element={<RegisterPage />} />
 
-                {/* Team Leader Portal Routes */}
+                {/* USER / STUDENT ROUTES */}
                 <Route
-                  path="/leader/dashboard"
+                  path="/dashboard"
                   element={
-                    <ProtectedLeaderRoute>
-                      <LeaderDashboard />
-                    </ProtectedLeaderRoute>
+                    <ProtectedRoute>
+                      <UserDashboard />
+                    </ProtectedRoute>
                   }
                 />
                 <Route
-                  path="/leader/create-team"
+                  path="/profile"
                   element={
-                    <ProtectedLeaderRoute>
-                      <LeaderCreateTeam />
-                    </ProtectedLeaderRoute>
+                    <ProtectedRoute>
+                      <UserProfileView />
+                    </ProtectedRoute>
                   }
                 />
                 <Route
-                  path="/leader/discover"
+                  path="/profile/edit"
                   element={
-                    <ProtectedLeaderRoute>
-                      <LeaderDiscovery />
-                    </ProtectedLeaderRoute>
+                    <ProtectedRoute>
+                      <UserProfileEdit />
+                    </ProtectedRoute>
                   }
                 />
                 <Route
-                  path="/leader/team"
+                  path="/github"
                   element={
-                    <ProtectedLeaderRoute>
-                      <LeaderTeamBuilder />
-                    </ProtectedLeaderRoute>
+                    <ProtectedRoute>
+                      <GitHubVerificationPage />
+                    </ProtectedRoute>
                   }
                 />
                 <Route
-                  path="/leader/invitations"
+                  path="/quiz"
                   element={
-                    <ProtectedLeaderRoute>
-                      <LeaderInvitations />
-                    </ProtectedLeaderRoute>
+                    <ProtectedRoute>
+                      <PersonalizedQuizPage />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/quiz/result"
+                  element={
+                    <ProtectedRoute>
+                      <QuizResultPage />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/find-team"
+                  element={
+                    <ProtectedRoute>
+                      <FindTeamPage />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/find-team/:id"
+                  element={
+                    <ProtectedRoute>
+                      <TeamDetailPage />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/invitations"
+                  element={
+                    <ProtectedRoute>
+                      <InvitationsPage />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/my-teams"
+                  element={
+                    <ProtectedRoute>
+                      <MyTeamsPage />
+                    </ProtectedRoute>
                   }
                 />
 
-                {/* Admin Portal Routes */}
+                {/* TEAM OWNER ROUTES */}
                 <Route
-                  path="/admin"
+                  path="/build-team"
                   element={
-                    <ProtectedAdminRoute>
-                      <AdminDashboard />
-                    </ProtectedAdminRoute>
+                    <ProtectedRoute>
+                      <BuildTeamPage />
+                    </ProtectedRoute>
                   }
                 />
+                <Route
+                  path="/team/:id"
+                  element={
+                    <ProtectedRoute>
+                      <TeamOwnerDashboard />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/team/:id/candidates"
+                  element={
+                    <ProtectedRoute>
+                      <TeamCandidatesDiscovery />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/team/:id/candidates/:candidateId"
+                  element={
+                    <ProtectedRoute>
+                      <TeamCandidatesDiscovery />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/team/:id/invitations"
+                  element={
+                    <ProtectedRoute>
+                      <TeamOwnerInvitations />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/team/:id/settings"
+                  element={
+                    <ProtectedRoute>
+                      <TeamOwnerSettings />
+                    </ProtectedRoute>
+                  }
+                />
+
+                {/* LEGACY REDIRECTS: Forward old separate candidate/leader routes to new paths */}
+                <Route path="/candidate/login" element={<Navigate to="/login?intent=find-team" replace />} />
+                <Route path="/candidate/register" element={<Navigate to="/register?intent=find-team" replace />} />
+                <Route path="/leader/login" element={<Navigate to="/login?intent=build-team" replace />} />
+                <Route path="/leader/register" element={<Navigate to="/register?intent=build-team" replace />} />
+                <Route path="/candidate/dashboard" element={<Navigate to="/dashboard" replace />} />
+                <Route path="/leader/dashboard" element={<Navigate to="/dashboard" replace />} />
+                <Route path="/candidate/teams" element={<Navigate to="/find-team" replace />} />
+                <Route path="/candidate/my-team" element={<Navigate to="/my-teams" replace />} />
+                <Route path="/candidate/invitations" element={<Navigate to="/invitations" replace />} />
+                <Route path="/candidate/onboarding" element={<Navigate to="/profile/edit" replace />} />
+                <Route path="/candidate/quiz" element={<Navigate to="/quiz" replace />} />
+                <Route path="/candidate/quiz-result" element={<Navigate to="/quiz/result" replace />} />
+                <Route path="/leader/create-team" element={<Navigate to="/build-team" replace />} />
+                <Route path="/leader/discover" element={<Navigate to="/find-team" replace />} />
+                <Route path="/leader/team" element={<Navigate to="/my-teams" replace />} />
+                <Route path="/leader/invitations" element={<Navigate to="/invitations" replace />} />
 
                 {/* Catch all fallback */}
                 <Route path="*" element={<Navigate to="/" replace />} />

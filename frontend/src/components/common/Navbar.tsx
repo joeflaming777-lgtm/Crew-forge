@@ -1,8 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
-import { apiClient } from '../../api/client';
-import { Notification } from '../../types';
 import {
   Users,
   Compass,
@@ -15,64 +13,34 @@ import {
   Shield,
   UserCheck,
   Check,
+  User as UserIcon,
+  ChevronDown,
+  Sparkles,
+  ExternalLink,
+  PlusCircle,
 } from 'lucide-react';
 
 export const Navbar: React.FC = () => {
-  const { user, isCandidate, isLeader, isAdmin, logout } = useAuth();
+  const {
+    user,
+    logout,
+    myOwnedTeams,
+    myMemberTeams,
+    myReceivedInvitations,
+    notifications,
+    unreadNotificationsCount,
+    markNotificationRead,
+    markAllNotificationsRead,
+    switchDemoUser,
+  } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
 
-  const [notifications, setNotifications] = useState<Notification[]>([]);
-  const [unreadCount, setUnreadCount] = useState<number>(0);
   const [showNotifications, setShowNotifications] = useState<boolean>(false);
-  const [pendingInvitesCount, setPendingInvitesCount] = useState<number>(0);
+  const [showManageDropdown, setShowManageDropdown] = useState<boolean>(false);
+  const [showProfileMenu, setShowProfileMenu] = useState<boolean>(false);
 
-  const isLandingPage = location.pathname === '/';
-
-  useEffect(() => {
-    if (user) {
-      fetchNotifications();
-      if (isCandidate) {
-        fetchCandidateInvites();
-      }
-    }
-  }, [user, location.pathname]);
-
-  const fetchNotifications = async () => {
-    try {
-      const res = await apiClient.get('/notifications');
-      if (res.data.success) {
-        setNotifications(res.data.notifications || []);
-        setUnreadCount(res.data.unreadCount || 0);
-      }
-    } catch {
-      // ignore
-    }
-  };
-
-  const fetchCandidateInvites = async () => {
-    try {
-      const res = await apiClient.get('/invitations');
-      if (res.data.success) {
-        const pending = (res.data.invitations || []).filter(
-          (inv: any) => inv.status === 'PENDING'
-        );
-        setPendingInvitesCount(pending.length);
-      }
-    } catch {
-      // ignore
-    }
-  };
-
-  const markAllNotificationsRead = async () => {
-    try {
-      await apiClient.put('/notifications/mark-all-read');
-      setUnreadCount(0);
-      setNotifications((prev) => prev.map((n) => ({ ...n, isRead: true })));
-    } catch {
-      // ignore
-    }
-  };
+  const pendingInvitesCount = myReceivedInvitations.filter((i) => i.status === 'PENDING').length;
 
   const scrollToChoosePath = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -112,13 +80,39 @@ export const Navbar: React.FC = () => {
     }
   };
 
+  // Determine contextual role label
+  const getContextualRole = (): { label: string; color: string; bg: string } => {
+    if (!user) return { label: 'Guest', color: '#94a3b8', bg: 'rgba(255,255,255,0.06)' };
+    if (myOwnedTeams.length > 0) {
+      return {
+        label: 'Team Owner',
+        color: '#2dd4bf',
+        bg: 'rgba(45, 212, 191, 0.12)',
+      };
+    }
+    if (myMemberTeams.length > 0) {
+      return {
+        label: 'Team Member',
+        color: '#818cf8',
+        bg: 'rgba(129, 140, 248, 0.12)',
+      };
+    }
+    return {
+      label: 'Looking for a Team',
+      color: '#38bdf8',
+      bg: 'rgba(56, 189, 248, 0.12)',
+    };
+  };
+
+  const roleInfo = getContextualRole();
+
   return (
     <nav
       style={{
         position: 'sticky',
         top: 0,
         zIndex: 500,
-        background: 'rgba(8, 11, 17, 0.85)',
+        background: 'rgba(8, 11, 17, 0.88)',
         backdropFilter: 'blur(16px)',
         borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
         height: '70px',
@@ -168,7 +162,7 @@ export const Navbar: React.FC = () => {
               WebkitTextFillColor: 'transparent',
             }}
           >
-            SkillSync
+            HackMate
           </span>
         </Link>
 
@@ -206,54 +200,151 @@ export const Navbar: React.FC = () => {
               </a>
             </div>
 
-            <button
-              onClick={scrollToChoosePath}
-              className="btn-primary"
-              style={{ padding: '0.6rem 1.4rem', fontSize: '0.9rem' }}
-            >
-              Get Started <ChevronRight size={16} />
-            </button>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+              <Link
+                to="/login"
+                style={{
+                  fontSize: '0.92rem',
+                  fontWeight: 600,
+                  color: '#cbd5e1',
+                  padding: '0.5rem 1rem',
+                  borderRadius: '8px',
+                }}
+              >
+                Log In
+              </Link>
+              <button
+                onClick={scrollToChoosePath}
+                className="btn-primary"
+                style={{ padding: '0.6rem 1.4rem', fontSize: '0.9rem' }}
+              >
+                Get Started <ChevronRight size={16} />
+              </button>
+            </div>
           </div>
         ) : (
-          /* ================= AUTHENTICATED PORTAL NAVS ================= */
+          /* ================= SINGLE AUTHENTICATED USER NAV ================= */
           <div style={{ display: 'flex', alignItems: 'center', gap: '1.25rem' }}>
-            {/* Candidate Nav Links */}
-            {isCandidate && (
-              <div style={{ display: 'flex', alignItems: 'center', gap: '1.2rem' }}>
-                <NavLink to="/candidate/dashboard" label="Dashboard" />
-                <NavLink to="/candidate/teams" label="Browse Teams" icon={<Compass size={16} />} />
-                <NavLink to="/candidate/my-team" label="My Team" icon={<Users size={16} />} />
-                <NavLink
-                  to="/candidate/invitations"
-                  label="Invitations"
-                  icon={<FileCheck size={16} />}
-                  badge={pendingInvitesCount > 0 ? pendingInvitesCount : undefined}
-                />
-                <NavLink to="/candidate/quiz" label="Skill Assessment" icon={<Award size={16} />} />
-              </div>
-            )}
+            {/* Main Navigation Links */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.8rem' }}>
+              <NavLink to="/dashboard" label="Dashboard" />
+              <NavLink to="/find-team" label="Find a Team" icon={<Compass size={16} />} />
+              <NavLink to="/my-teams" label="My Teams" icon={<Users size={16} />} />
+              <NavLink
+                to="/invitations"
+                label="Invitations"
+                icon={<FileCheck size={16} />}
+                badge={pendingInvitesCount > 0 ? pendingInvitesCount : undefined}
+              />
+              <NavLink to="/profile" label="Profile" icon={<UserIcon size={16} />} />
 
-            {/* Team Leader Nav Links */}
-            {isLeader && (
-              <div style={{ display: 'flex', alignItems: 'center', gap: '1.2rem' }}>
-                <NavLink to="/leader/dashboard" label="Dashboard" />
-                <NavLink to="/leader/discover" label="Discover Candidates" icon={<UserCheck size={16} />} />
-                <NavLink to="/leader/team" label="Team Builder" icon={<Layers size={16} />} />
-                <NavLink to="/leader/invitations" label="Sent Invitations" icon={<FileCheck size={16} />} />
-              </div>
-            )}
+              {/* If user owns one or more teams, show Manage Teams */}
+              {myOwnedTeams.length > 0 && (
+                <div style={{ position: 'relative' }}>
+                  <button
+                    onClick={() => setShowManageDropdown(!showManageDropdown)}
+                    style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '5px',
+                      fontSize: '0.875rem',
+                      fontWeight: 600,
+                      color: '#2dd4bf',
+                      padding: '6px 12px',
+                      borderRadius: '8px',
+                      background: 'rgba(45, 212, 191, 0.1)',
+                      border: '1px solid rgba(45, 212, 191, 0.25)',
+                    }}
+                  >
+                    <Layers size={15} />
+                    <span>Manage Teams ({myOwnedTeams.length})</span>
+                    <ChevronDown size={14} />
+                  </button>
 
-            {/* Admin Nav Links */}
-            {isAdmin && (
-              <div style={{ display: 'flex', alignItems: 'center', gap: '1.2rem' }}>
-                <NavLink to="/admin" label="Overview" icon={<Shield size={16} />} />
-              </div>
-            )}
+                  {showManageDropdown && (
+                    <div
+                      style={{
+                        position: 'absolute',
+                        top: '42px',
+                        left: 0,
+                        width: '240px',
+                        background: '#101726',
+                        border: '1px solid rgba(255,255,255,0.12)',
+                        borderRadius: '12px',
+                        boxShadow: '0 16px 36px rgba(0,0,0,0.6)',
+                        padding: '0.5rem',
+                        zIndex: 1000,
+                      }}
+                    >
+                      <div
+                        style={{
+                          fontSize: '0.75rem',
+                          fontWeight: 700,
+                          color: '#64748b',
+                          padding: '6px 10px',
+                          textTransform: 'uppercase',
+                        }}
+                      >
+                        Teams You Own
+                      </div>
+                      {myOwnedTeams.map((team) => (
+                        <Link
+                          key={team.id}
+                          to={`/team/${team.id}`}
+                          onClick={() => setShowManageDropdown(false)}
+                          style={{
+                            display: 'flex',
+                            flexDirection: 'column',
+                            padding: '8px 10px',
+                            borderRadius: '8px',
+                            textDecoration: 'none',
+                            color: '#f8fafc',
+                            transition: 'background 0.15s',
+                          }}
+                          onMouseEnter={(e) => (e.currentTarget.style.background = 'rgba(255,255,255,0.06)')}
+                          onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
+                        >
+                          <span style={{ fontWeight: 600, fontSize: '0.875rem' }}>{team.name}</span>
+                          <span style={{ fontSize: '0.75rem', color: '#94a3b8' }}>{team.hackathonName}</span>
+                        </Link>
+                      ))}
+                      <div
+                        style={{
+                          borderTop: '1px solid rgba(255,255,255,0.08)',
+                          marginTop: '4px',
+                          paddingTop: '4px',
+                        }}
+                      >
+                        <Link
+                          to="/build-team"
+                          onClick={() => setShowManageDropdown(false)}
+                          style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '6px',
+                            padding: '8px 10px',
+                            fontSize: '0.825rem',
+                            color: '#38bdf8',
+                            fontWeight: 600,
+                          }}
+                        >
+                          <PlusCircle size={14} /> Create Another Team
+                        </Link>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
 
             {/* Notifications Bell Dropdown */}
             <div style={{ position: 'relative' }}>
               <button
-                onClick={() => setShowNotifications(!showNotifications)}
+                onClick={() => {
+                  setShowNotifications(!showNotifications);
+                  setShowManageDropdown(false);
+                  setShowProfileMenu(false);
+                }}
                 style={{
                   position: 'relative',
                   padding: '8px',
@@ -266,7 +357,7 @@ export const Navbar: React.FC = () => {
                 }}
               >
                 <Bell size={18} />
-                {unreadCount > 0 && (
+                {unreadNotificationsCount > 0 && (
                   <span
                     style={{
                       position: 'absolute',
@@ -309,32 +400,63 @@ export const Navbar: React.FC = () => {
                     }}
                   >
                     <span style={{ fontWeight: 700, fontSize: '0.9rem', color: '#f8fafc' }}>
-                      Notifications ({unreadCount})
+                      Notifications ({unreadNotificationsCount})
                     </span>
-                    {unreadCount > 0 && (
+                    {unreadNotificationsCount > 0 && (
                       <button
                         onClick={markAllNotificationsRead}
-                        style={{ fontSize: '0.75rem', color: '#6366f1', display: 'flex', alignItems: 'center', gap: '4px' }}
+                        style={{
+                          fontSize: '0.75rem',
+                          color: '#6366f1',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '4px',
+                        }}
                       >
                         <Check size={12} /> Mark read
                       </button>
                     )}
                   </div>
 
-                  <div style={{ maxHeight: '280px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                  <div
+                    style={{
+                      maxHeight: '280px',
+                      overflowY: 'auto',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: '8px',
+                    }}
+                  >
                     {notifications.length === 0 ? (
-                      <p style={{ fontSize: '0.825rem', color: '#64748b', textAlign: 'center', padding: '1.5rem 0' }}>
+                      <p
+                        style={{
+                          fontSize: '0.825rem',
+                          color: '#64748b',
+                          textAlign: 'center',
+                          padding: '1.5rem 0',
+                        }}
+                      >
                         No notifications yet.
                       </p>
                     ) : (
                       notifications.slice(0, 6).map((notif) => (
                         <div
                           key={notif.id}
+                          onClick={() => {
+                            markNotificationRead(notif.id);
+                            if (notif.link) {
+                              navigate(notif.link);
+                              setShowNotifications(false);
+                            }
+                          }}
                           style={{
                             padding: '8px 10px',
                             borderRadius: '8px',
                             background: notif.isRead ? 'transparent' : 'rgba(99, 102, 241, 0.08)',
-                            border: notif.isRead ? '1px solid transparent' : '1px solid rgba(99, 102, 241, 0.2)',
+                            border: notif.isRead
+                              ? '1px solid transparent'
+                              : '1px solid rgba(99, 102, 241, 0.2)',
+                            cursor: 'pointer',
                           }}
                         >
                           <div style={{ fontSize: '0.825rem', fontWeight: 600, color: '#f8fafc' }}>
@@ -351,38 +473,226 @@ export const Navbar: React.FC = () => {
               )}
             </div>
 
-            {/* User Profile Pill & Logout */}
-            <div
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '8px',
-                padding: '4px 8px 4px 12px',
-                borderRadius: '9999px',
-                background: 'rgba(255,255,255,0.05)',
-                border: '1px solid rgba(255,255,255,0.08)',
-              }}
-            >
-              <span style={{ fontSize: '0.85rem', fontWeight: 600, color: '#e2e8f0' }}>
-                {user.candidateProfile?.fullName?.split(' ')[0] ||
-                  user.leaderProfile?.fullName?.split(' ')[0] ||
-                  'Admin'}
-              </span>
+            {/* User Profile Pill & Contextual Role Badge */}
+            <div style={{ position: 'relative' }}>
               <button
-                onClick={logout}
-                title="Logout"
+                onClick={() => setShowProfileMenu(!showProfileMenu)}
                 style={{
-                  padding: '6px',
-                  borderRadius: '50%',
-                  color: '#94a3b8',
                   display: 'flex',
                   alignItems: 'center',
+                  gap: '8px',
+                  padding: '4px 10px 4px 6px',
+                  borderRadius: '9999px',
+                  background: 'rgba(255,255,255,0.05)',
+                  border: '1px solid rgba(255,255,255,0.08)',
                 }}
-                onMouseEnter={(e) => (e.currentTarget.style.color = '#f43f5e')}
-                onMouseLeave={(e) => (e.currentTarget.style.color = '#94a3b8')}
               >
-                <LogOut size={16} />
+                {user.avatarUrl ? (
+                  <img
+                    src={user.avatarUrl}
+                    alt={user.fullName}
+                    style={{ width: '28px', height: '28px', borderRadius: '50%', objectFit: 'cover' }}
+                  />
+                ) : (
+                  <div
+                    style={{
+                      width: '28px',
+                      height: '28px',
+                      borderRadius: '50%',
+                      background: '#6366f1',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      fontSize: '0.8rem',
+                      fontWeight: 700,
+                      color: '#fff',
+                    }}
+                  >
+                    {user.fullName[0]}
+                  </div>
+                )}
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
+                  <span style={{ fontSize: '0.85rem', fontWeight: 600, color: '#e2e8f0', lineHeight: 1.2 }}>
+                    {user.fullName.split(' ')[0]}
+                  </span>
+                  <span
+                    style={{
+                      fontSize: '0.7rem',
+                      fontWeight: 700,
+                      color: roleInfo.color,
+                      lineHeight: 1,
+                    }}
+                  >
+                    {roleInfo.label}
+                  </span>
+                </div>
+                <ChevronDown size={14} color="#94a3b8" />
               </button>
+
+              {/* Profile Menu Dropdown */}
+              {showProfileMenu && (
+                <div
+                  style={{
+                    position: 'absolute',
+                    top: '44px',
+                    right: 0,
+                    width: '220px',
+                    background: '#101726',
+                    border: '1px solid rgba(255,255,255,0.12)',
+                    borderRadius: '14px',
+                    boxShadow: '0 20px 40px rgba(0,0,0,0.6)',
+                    padding: '0.5rem',
+                    zIndex: 1000,
+                  }}
+                >
+                  <div style={{ padding: '8px 10px', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+                    <div style={{ fontSize: '0.85rem', fontWeight: 700, color: '#f8fafc' }}>
+                      {user.fullName}
+                    </div>
+                    <div style={{ fontSize: '0.75rem', color: '#94a3b8' }}>{user.email}</div>
+                    <div
+                      style={{
+                        display: 'inline-block',
+                        marginTop: '4px',
+                        fontSize: '0.7rem',
+                        fontWeight: 600,
+                        color: roleInfo.color,
+                        background: roleInfo.bg,
+                        padding: '2px 8px',
+                        borderRadius: '9999px',
+                      }}
+                    >
+                      {roleInfo.label}
+                    </div>
+                  </div>
+
+                  <div style={{ padding: '4px 0' }}>
+                    <Link
+                      to="/profile"
+                      onClick={() => setShowProfileMenu(false)}
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '8px',
+                        padding: '8px 10px',
+                        borderRadius: '8px',
+                        fontSize: '0.85rem',
+                        color: '#cbd5e1',
+                      }}
+                      onMouseEnter={(e) => (e.currentTarget.style.background = 'rgba(255,255,255,0.05)')}
+                      onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
+                    >
+                      <UserIcon size={15} /> View Full Profile
+                    </Link>
+
+                    <Link
+                      to="/profile/edit"
+                      onClick={() => setShowProfileMenu(false)}
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '8px',
+                        padding: '8px 10px',
+                        borderRadius: '8px',
+                        fontSize: '0.85rem',
+                        color: '#cbd5e1',
+                      }}
+                      onMouseEnter={(e) => (e.currentTarget.style.background = 'rgba(255,255,255,0.05)')}
+                      onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
+                    >
+                      <Sparkles size={15} /> Edit Skills & Roles
+                    </Link>
+                  </div>
+
+                  {/* Switch Demo Profile */}
+                  <div
+                    style={{
+                      borderTop: '1px solid rgba(255,255,255,0.06)',
+                      padding: '6px 10px 4px',
+                      fontSize: '0.72rem',
+                      fontWeight: 700,
+                      color: '#64748b',
+                      textTransform: 'uppercase',
+                    }}
+                  >
+                    Quick Switch Account
+                  </div>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                    <button
+                      onClick={() => {
+                        switchDemoUser('user-arjun');
+                        setShowProfileMenu(false);
+                      }}
+                      style={{
+                        textAlign: 'left',
+                        padding: '4px 10px',
+                        borderRadius: '6px',
+                        fontSize: '0.78rem',
+                        color: user.id === 'user-arjun' ? '#6366f1' : '#94a3b8',
+                        fontWeight: user.id === 'user-arjun' ? 700 : 500,
+                      }}
+                    >
+                      Arjun Sharma (Owner & Member)
+                    </button>
+                    <button
+                      onClick={() => {
+                        switchDemoUser('user-priya');
+                        setShowProfileMenu(false);
+                      }}
+                      style={{
+                        textAlign: 'left',
+                        padding: '4px 10px',
+                        borderRadius: '6px',
+                        fontSize: '0.78rem',
+                        color: user.id === 'user-priya' ? '#6366f1' : '#94a3b8',
+                        fontWeight: user.id === 'user-priya' ? 700 : 500,
+                      }}
+                    >
+                      Priya Patel (Looking for Team)
+                    </button>
+                    <button
+                      onClick={() => {
+                        switchDemoUser('user-aarav');
+                        setShowProfileMenu(false);
+                      }}
+                      style={{
+                        textAlign: 'left',
+                        padding: '4px 10px',
+                        borderRadius: '6px',
+                        fontSize: '0.78rem',
+                        color: user.id === 'user-aarav' ? '#6366f1' : '#94a3b8',
+                        fontWeight: user.id === 'user-aarav' ? 700 : 500,
+                      }}
+                    >
+                      Aarav Mehta (Team Owner)
+                    </button>
+                  </div>
+
+                  <div style={{ borderTop: '1px solid rgba(255,255,255,0.06)', marginTop: '4px', paddingTop: '4px' }}>
+                    <button
+                      onClick={() => {
+                        logout();
+                        setShowProfileMenu(false);
+                        navigate('/');
+                      }}
+                      style={{
+                        width: '100%',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '8px',
+                        padding: '8px 10px',
+                        borderRadius: '8px',
+                        fontSize: '0.85rem',
+                        color: '#f43f5e',
+                      }}
+                      onMouseEnter={(e) => (e.currentTarget.style.background = 'rgba(244,63,94,0.1)')}
+                      onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
+                    >
+                      <LogOut size={15} /> Log Out
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         )}
@@ -398,7 +708,7 @@ const NavLink: React.FC<{
   badge?: number;
 }> = ({ to, label, icon, badge }) => {
   const location = useLocation();
-  const isActive = location.pathname === to;
+  const isActive = location.pathname === to || (to !== '/dashboard' && location.pathname.startsWith(to));
 
   return (
     <Link
@@ -410,7 +720,7 @@ const NavLink: React.FC<{
         fontSize: '0.875rem',
         fontWeight: isActive ? 600 : 500,
         color: isActive ? '#f8fafc' : '#94a3b8',
-        padding: '6px 10px',
+        padding: '6px 11px',
         borderRadius: '8px',
         background: isActive ? 'rgba(99, 102, 241, 0.15)' : 'transparent',
         transition: 'all 0.2s',
