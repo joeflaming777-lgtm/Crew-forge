@@ -186,11 +186,12 @@ export const App: React.FC = () => {
                   }
                 />
 
-                {/* LEGACY REDIRECTS: Forward old separate candidate/leader routes to new paths */}
-                <Route path="/candidate/login" element={<Navigate to="/login?intent=find-team" replace />} />
-                <Route path="/candidate/register" element={<Navigate to="/register?intent=find-team" replace />} />
-                <Route path="/leader/login" element={<Navigate to="/login?intent=build-team" replace />} />
-                <Route path="/leader/register" element={<Navigate to="/register?intent=build-team" replace />} />
+                {/* LEGACY REDIRECTS: Forward any old paths directly to the single User Login & Registration */}
+                <Route path="/candidate/login" element={<Navigate to="/login" replace />} />
+                <Route path="/candidate/register" element={<Navigate to="/register" replace />} />
+                <Route path="/leader/login" element={<Navigate to="/login" replace />} />
+                <Route path="/leader/register" element={<Navigate to="/register" replace />} />
+                <Route path="/admin/login" element={<Navigate to="/login" replace />} />
                 <Route path="/candidate/dashboard" element={<Navigate to="/dashboard" replace />} />
                 <Route path="/leader/dashboard" element={<Navigate to="/dashboard" replace />} />
                 <Route path="/candidate/teams" element={<Navigate to="/find-team" replace />} />

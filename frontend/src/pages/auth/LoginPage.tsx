@@ -30,7 +30,7 @@ export const LoginPage: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!email) {
-      toast.error('Please enter your student email address.');
+      toast.error('Please enter your user email address.');
       return;
     }
 
@@ -49,7 +49,7 @@ export const LoginPage: React.FC = () => {
   const fillDemoStudent = (emailVal: string, name: string) => {
     setEmail(emailVal);
     setPassword('student123');
-    toast.info(`Selected demo account: ${name}`);
+    toast.info(`Selected demo user: ${name}`);
   };
 
   return (
@@ -94,65 +94,24 @@ export const LoginPage: React.FC = () => {
           </div>
 
           <h2 style={{ fontSize: '1.85rem', fontWeight: 800, color: '#f8fafc', letterSpacing: '-0.02em' }}>
-            Student Login
+            User Login
           </h2>
 
           <p style={{ fontSize: '0.925rem', color: '#94a3b8', marginTop: '6px' }}>
-            One student profile. Find teams or build teams for any hackathon.
+            One single user account. Find teams or build teams for any hackathon.
           </p>
-
-          {/* Context Intent Banner */}
-          {intent === 'find-team' && (
-            <div
-              style={{
-                marginTop: '1rem',
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '6px',
-                padding: '6px 14px',
-                borderRadius: '9999px',
-                background: 'rgba(99, 102, 241, 0.15)',
-                border: '1px solid rgba(99, 102, 241, 0.3)',
-                color: '#a5b4fc',
-                fontSize: '0.8rem',
-                fontWeight: 600,
-              }}
-            >
-              <Compass size={14} /> Preserved Action: Find a Team
-            </div>
-          )}
-
-          {intent === 'build-team' && (
-            <div
-              style={{
-                marginTop: '1rem',
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '6px',
-                padding: '6px 14px',
-                borderRadius: '9999px',
-                background: 'rgba(6, 182, 212, 0.15)',
-                border: '1px solid rgba(6, 182, 212, 0.3)',
-                color: '#38bdf8',
-                fontSize: '0.8rem',
-                fontWeight: 600,
-              }}
-            >
-              <Layers size={14} /> Preserved Action: Build a Team
-            </div>
-          )}
         </div>
 
         <form onSubmit={handleSubmit}>
           <div className="form-group" style={{ marginBottom: '1.25rem' }}>
             <label className="form-label" style={{ fontSize: '0.85rem', color: '#cbd5e1', fontWeight: 600 }}>
-              Student Email
+              User Email
             </label>
             <div style={{ position: 'relative' }}>
               <input
                 type="email"
                 className="input-field"
-                placeholder="student@college.edu"
+                placeholder="user@college.edu"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 style={{
@@ -208,14 +167,14 @@ export const LoginPage: React.FC = () => {
             className="btn-primary"
             style={{ width: '100%', padding: '0.9rem', fontSize: '1rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}
           >
-            {loading ? 'Authenticating...' : 'Sign In to Dashboard'} <ArrowRight size={18} />
+            {loading ? 'Authenticating...' : 'Sign In as User'} <ArrowRight size={18} />
           </button>
         </form>
 
         {/* 1-Click Demo Profiles */}
         <div style={{ marginTop: '1.75rem' }}>
           <div style={{ fontSize: '0.78rem', color: '#64748b', textAlign: 'center', marginBottom: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 700 }}>
-            Instant Evaluation Demo Accounts
+            1-Click Demo User Accounts
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '8px' }}>
             <button
@@ -230,7 +189,7 @@ export const LoginPage: React.FC = () => {
                 fontSize: '0.825rem',
               }}
             >
-              <span>Arjun Sharma (Team Owner & Member)</span>
+              <span>Arjun Sharma (User: Team Owner & Member)</span>
               <Sparkles size={14} color="#f59e0b" />
             </button>
             <button
@@ -245,7 +204,7 @@ export const LoginPage: React.FC = () => {
                 fontSize: '0.825rem',
               }}
             >
-              <span>Priya Patel (Looking for a Team)</span>
+              <span>Priya Patel (User: Looking for Team)</span>
               <Sparkles size={14} color="#38bdf8" />
             </button>
             <button
@@ -260,7 +219,7 @@ export const LoginPage: React.FC = () => {
                 fontSize: '0.825rem',
               }}
             >
-              <span>Aarav Mehta (Team Owner - NeuralNomads)</span>
+              <span>Aarav Mehta (User: Team Owner)</span>
               <Sparkles size={14} color="#2dd4bf" />
             </button>
           </div>
@@ -277,12 +236,12 @@ export const LoginPage: React.FC = () => {
             color: '#94a3b8',
           }}
         >
-          New to HackMate?{' '}
+          Don't have an account?{' '}
           <Link
-            to={intent ? `/register?intent=${intent}` : '/register'}
+            to="/register"
             style={{ color: '#818cf8', fontWeight: 600 }}
           >
-            Create Your Student Profile
+            Create User Account
           </Link>
         </div>
       </motion.div>

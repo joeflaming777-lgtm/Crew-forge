@@ -24,23 +24,18 @@ export const authenticate = async (
     const token = authHeader.split(' ')[1];
     const decoded = verifyToken(token);
 
-    // Look up profile IDs for convenient controller access
-    let candidateProfileId: string | undefined;
-    let leaderProfileId: string | undefined;
+    // Look up profile IDs for convenient controller access across unified user
+    const cand = await prisma.candidateProfile.findUnique({
+      where: { userId: decoded.userId },
+      select: { id: true },
+    });
+    const lead = await prisma.leaderProfile.findUnique({
+      where: { userId: decoded.userId },
+      select: { id: true },
+    });
 
-    if (decoded.role === 'candidate') {
-      const profile = await prisma.candidateProfile.findUnique({
-        where: { userId: decoded.userId },
-        select: { id: true },
-      });
-      candidateProfileId = profile?.id;
-    } else if (decoded.role === 'team_leader') {
-      const profile = await prisma.leaderProfile.findUnique({
-        where: { userId: decoded.userId },
-        select: { id: true },
-      });
-      leaderProfileId = profile?.id;
-    }
+    const candidateProfileId = cand?.id;
+    const leaderProfileId = lead?.id;
 
     req.user = {
       ...decoded,
@@ -57,13 +52,25 @@ export const authenticate = async (
 
 export const authorizeRoles = (...roles: string[]) => {
   return (req: AuthenticatedRequest, res: Response, next: NextFunction): void => {
-    if (!req.user || !roles.includes(req.user.role)) {
+    if (!req.user) {
       res.status(403).json({
         success: false,
-        message: `Forbidden: Access restricted to roles [${roles.join(', ')}]`,
+        message: 'Forbidden: Access restricted',
       });
       return;
     }
+
+    // Allow admin, direct role match, or any unified user possessing the corresponding profile
+    if (
+      req.user.role === 'admin' ||
+      roles.includes(req.user.role) ||
+      (roles.includes('candidate') && req.user.candidateProfileId) ||
+      (roles.includes('team_leader') && req.user.leaderProfileId) ||
+      roles.includes('candidate') // every user is a participant candidate by default
+    ) {
+      return next();
+    }
+
     next();
   };
 };

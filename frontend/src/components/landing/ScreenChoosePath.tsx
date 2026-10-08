@@ -10,7 +10,7 @@ export const ScreenChoosePath: React.FC = () => {
   const { login, switchDemoUser } = useAuth();
   const toast = useToast();
 
-  const handleQuickLogin = async (userKey: 'arjun' | 'priya' | 'aarav', targetIntent?: string) => {
+  const handleQuickLogin = async (userKey: 'arjun' | 'priya' | 'aarav') => {
     try {
       const emailMap = {
         arjun: 'arjun@hackmate.dev',
@@ -27,14 +27,7 @@ export const ScreenChoosePath: React.FC = () => {
       toast.info(`Logging in as ${nameMap[userKey]}...`);
       await login(emailMap[userKey]);
       toast.success(`Welcome back, ${nameMap[userKey]}!`);
-
-      if (targetIntent === 'find-team') {
-        navigate('/find-team');
-      } else if (targetIntent === 'build-team') {
-        navigate('/build-team');
-      } else {
-        navigate('/dashboard');
-      }
+      navigate('/dashboard');
     } catch {
       toast.error('Quick login failed.');
     }
@@ -68,7 +61,7 @@ export const ScreenChoosePath: React.FC = () => {
               marginBottom: '0.8rem',
             }}
           >
-            Choose Your Path
+            One Platform. One User Login.
           </motion.h2>
 
           <motion.p
@@ -81,17 +74,17 @@ export const ScreenChoosePath: React.FC = () => {
               color: '#94a3b8',
             }}
           >
-            One student account. Endless hackathon possibilities.
+            A single unified user account for all hackathons. Join teams or lead teams seamlessly.
           </motion.p>
         </div>
 
-        {/* The Two Large Interactive Cards */}
+        {/* The Two Feature Cards */}
         <div
           style={{
             display: 'grid',
             gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
             gap: '2.5rem',
-            marginBottom: '3rem',
+            marginBottom: '2.5rem',
           }}
         >
           {/* Find a Team Card */}
@@ -145,7 +138,7 @@ export const ScreenChoosePath: React.FC = () => {
                   marginBottom: '0.5rem',
                 }}
               >
-                <Sparkles size={14} /> Looking to Join a Squad
+                <Sparkles size={14} /> Join a Team
               </div>
 
               <h3
@@ -157,7 +150,7 @@ export const ScreenChoosePath: React.FC = () => {
                   marginBottom: '1rem',
                 }}
               >
-                Looking for a Hackathon Team?
+                Discover & Join Teams
               </h3>
 
               <p
@@ -168,13 +161,13 @@ export const ScreenChoosePath: React.FC = () => {
                   marginBottom: '2rem',
                 }}
               >
-                Create your student profile, verify your skills, and discover hackathon teams looking for your expertise.
+                Create your verified profile, showcase GitHub code and skill assessments, and match with teams seeking your skillset.
               </p>
             </div>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
               <button
-                onClick={() => navigate('/login?intent=find-team')}
+                onClick={() => navigate('/login')}
                 className="btn-primary"
                 style={{
                   width: '100%',
@@ -182,18 +175,8 @@ export const ScreenChoosePath: React.FC = () => {
                   fontSize: '1.05rem',
                 }}
               >
-                Find a Team <ArrowRight size={20} />
+                User Login to Explore <ArrowRight size={20} />
               </button>
-
-              <div style={{ display: 'flex', justifyContent: 'center', gap: '1rem', fontSize: '0.85rem' }}>
-                <span style={{ color: '#64748b' }}>New student?</span>
-                <button
-                  onClick={() => navigate('/register?intent=find-team')}
-                  style={{ color: '#818cf8', fontWeight: 600 }}
-                >
-                  Create Student Profile
-                </button>
-              </div>
             </div>
           </motion.div>
 
@@ -248,7 +231,7 @@ export const ScreenChoosePath: React.FC = () => {
                   marginBottom: '0.5rem',
                 }}
               >
-                <Sparkles size={14} /> Leading or Forming a Squad
+                <Sparkles size={14} /> Form a Team
               </div>
 
               <h3
@@ -260,7 +243,7 @@ export const ScreenChoosePath: React.FC = () => {
                   marginBottom: '1rem',
                 }}
               >
-                Building a Hackathon Team?
+                Build & Lead a Squad
               </h3>
 
               <p
@@ -271,13 +254,13 @@ export const ScreenChoosePath: React.FC = () => {
                   marginBottom: '2rem',
                 }}
               >
-                Create your team, discover verified student candidates, and invite the right people for your hackathon.
+                Register your hackathon squad, specify needed roles and skills, find verified student candidates, and send invitations.
               </p>
             </div>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
               <button
-                onClick={() => navigate('/login?intent=build-team')}
+                onClick={() => navigate('/login')}
                 className="btn-primary"
                 style={{
                   width: '100%',
@@ -287,27 +270,67 @@ export const ScreenChoosePath: React.FC = () => {
                   boxShadow: '0 4px 15px rgba(6, 182, 212, 0.35)',
                 }}
               >
-                Build a Team <ArrowRight size={20} />
+                User Login to Build <ArrowRight size={20} />
               </button>
-
-              <div style={{ display: 'flex', justifyContent: 'center', gap: '1rem', fontSize: '0.85rem' }}>
-                <span style={{ color: '#64748b' }}>New student?</span>
-                <button
-                  onClick={() => navigate('/register?intent=build-team')}
-                  style={{ color: '#2dd4bf', fontWeight: 600 }}
-                >
-                  Create Student Profile
-                </button>
-              </div>
             </div>
           </motion.div>
+        </div>
+
+        {/* Unified Authentication Quick Actions */}
+        <div
+          style={{
+            background: 'rgba(255, 255, 255, 0.03)',
+            border: '1px solid rgba(255, 255, 255, 0.08)',
+            borderRadius: '20px',
+            padding: '1.5rem 2rem',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '1.25rem',
+            marginBottom: '1.5rem',
+          }}
+        >
+          <div
+            style={{
+              display: 'flex',
+              flexWrap: 'wrap',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              gap: '1rem',
+            }}
+          >
+            <div>
+              <h4 style={{ fontSize: '1.1rem', fontWeight: 700, color: '#f8fafc', marginBottom: '4px' }}>
+                Single User Account
+              </h4>
+              <p style={{ fontSize: '0.9rem', color: '#94a3b8' }}>
+                Log in to access both finding teammates and creating teams under one user profile.
+              </p>
+            </div>
+
+            <div style={{ display: 'flex', gap: '12px' }}>
+              <button
+                onClick={() => navigate('/login')}
+                className="btn-primary"
+                style={{ padding: '0.75rem 1.75rem', fontSize: '0.95rem' }}
+              >
+                User Login
+              </button>
+              <button
+                onClick={() => navigate('/register')}
+                className="btn-secondary"
+                style={{ padding: '0.75rem 1.75rem', fontSize: '0.95rem' }}
+              >
+                Create Account
+              </button>
+            </div>
+          </div>
         </div>
 
         {/* 1-Click Instant Demo Login Bar */}
         <div
           style={{
-            background: 'rgba(255, 255, 255, 0.03)',
-            border: '1px solid rgba(255, 255, 255, 0.07)',
+            background: 'rgba(255, 255, 255, 0.02)',
+            border: '1px solid rgba(255, 255, 255, 0.06)',
             borderRadius: '16px',
             padding: '1.25rem 1.75rem',
             display: 'flex',
@@ -319,32 +342,32 @@ export const ScreenChoosePath: React.FC = () => {
         >
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
             <Key size={18} color="#f59e0b" />
-            <span style={{ fontSize: '0.9rem', color: '#cbd5e1', fontWeight: 500 }}>
-              1-Click Demo Student Accounts:
+            <span style={{ fontSize: '0.9rem', color: '#cbd5e1', fontWeight: 600 }}>
+              1-Click Demo User Logins:
             </span>
           </div>
 
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
             <button
-              onClick={() => handleQuickLogin('arjun', 'find-team')}
+              onClick={() => handleQuickLogin('arjun')}
               className="btn-secondary btn-sm"
               style={{ fontSize: '0.825rem' }}
             >
-              Arjun Sharma (Owner & Member)
+              Arjun Sharma (User: Owner & Member)
             </button>
             <button
-              onClick={() => handleQuickLogin('priya', 'find-team')}
+              onClick={() => handleQuickLogin('priya')}
               className="btn-secondary btn-sm"
               style={{ fontSize: '0.825rem' }}
             >
-              Priya Patel (Looking for Team)
+              Priya Patel (User: Looking for Team)
             </button>
             <button
-              onClick={() => handleQuickLogin('aarav', 'build-team')}
+              onClick={() => handleQuickLogin('aarav')}
               className="btn-secondary btn-sm"
               style={{ fontSize: '0.825rem' }}
             >
-              Aarav Mehta (Team Owner)
+              Aarav Mehta (User: Team Owner)
             </button>
           </div>
         </div>

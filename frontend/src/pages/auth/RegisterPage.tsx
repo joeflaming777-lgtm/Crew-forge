@@ -106,33 +106,12 @@ export const RegisterPage: React.FC = () => {
           </div>
 
           <h2 style={{ fontSize: '1.85rem', fontWeight: 800, color: '#f8fafc', letterSpacing: '-0.02em' }}>
-            Create Student Profile
+            Create User Account
           </h2>
 
           <p style={{ fontSize: '0.925rem', color: '#94a3b8', marginTop: '6px' }}>
-            One account for all hackathons. Join teams, recruit teammates, and showcase skills.
+            One unified user account for all hackathons. Join teams, create teams, and showcase skills.
           </p>
-
-          {intent && (
-            <div
-              style={{
-                marginTop: '1rem',
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '6px',
-                padding: '6px 14px',
-                borderRadius: '9999px',
-                background: 'rgba(99, 102, 241, 0.15)',
-                border: '1px solid rgba(99, 102, 241, 0.3)',
-                color: '#a5b4fc',
-                fontSize: '0.8rem',
-                fontWeight: 600,
-              }}
-            >
-              {intent === 'find-team' ? <Compass size={14} /> : <Layers size={14} />}
-              {intent === 'find-team' ? 'Directing to: Find a Team' : 'Directing to: Build a Team'}
-            </div>
-          )}
         </div>
 
         <form onSubmit={handleSubmit}>
@@ -323,7 +302,7 @@ export const RegisterPage: React.FC = () => {
               gap: '8px',
             }}
           >
-            {loading ? 'Creating Profile...' : 'Complete & Launch Profile'} <ArrowRight size={18} />
+            {loading ? 'Creating Account...' : 'Create User Account'} <ArrowRight size={18} />
           </button>
         </form>
 
@@ -337,12 +316,12 @@ export const RegisterPage: React.FC = () => {
             color: '#94a3b8',
           }}
         >
-          Already registered?{' '}
+          Already have an account?{' '}
           <Link
-            to={intent ? `/login?intent=${intent}` : '/login'}
+            to="/login"
             style={{ color: '#818cf8', fontWeight: 600 }}
           >
-            Log In Here
+            Log In as User
           </Link>
         </div>
       </motion.div>

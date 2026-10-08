@@ -14,10 +14,15 @@ import { authenticate, authorizeRoles } from '../middleware/auth';
 const router = Router();
 
 // ==================== AUTH ROUTES ====================
-router.post('/auth/candidate/register', AuthController.candidateRegister);
-router.post('/auth/candidate/login', AuthController.candidateLogin);
-router.post('/auth/leader/register', AuthController.leaderRegister);
-router.post('/auth/leader/login', AuthController.leaderLogin);
+// Unified single user login & registration for all users
+router.post('/auth/login', AuthController.userLogin);
+router.post('/auth/register', AuthController.userRegister);
+
+// Backward compatibility endpoints (all route to unified user auth)
+router.post('/auth/candidate/register', AuthController.userRegister);
+router.post('/auth/candidate/login', AuthController.userLogin);
+router.post('/auth/leader/register', AuthController.userRegister);
+router.post('/auth/leader/login', AuthController.userLogin);
 router.post('/auth/admin/login', AuthController.adminLogin);
 router.get('/auth/me', authenticate, AuthController.getMe);
 
