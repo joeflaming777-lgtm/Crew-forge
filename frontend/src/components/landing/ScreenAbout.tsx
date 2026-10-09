@@ -13,7 +13,7 @@ export const ScreenAbout: React.FC = () => {
     },
     {
       title: 'Evaluate',
-      description: 'Review quiz performance and GitHub-based technical evidence.',
+      description: 'Review verified technical skills and GitHub-based code evidence.',
       icon: <Award size={28} color="#10b981" />,
       glowColor: 'rgba(16, 185, 129, 0.25)',
       gradient: 'linear-gradient(135deg, rgba(16, 185, 129, 0.15), rgba(5, 150, 105, 0.05))',
@@ -118,7 +118,7 @@ export const ScreenAbout: React.FC = () => {
               margin: '0 auto',
             }}
           >
-            SkillSync provides a structured way to discover, evaluate and connect suitable teammates using student profiles, verified skills, personalized assessments, GitHub code analysis, explainable match scores, and invitation-based joining.
+            SkillSync provides a structured way to discover, evaluate and connect suitable teammates using student profiles, verified skills, GitHub code analysis, explainable match scores, and invitation-based joining.
           </motion.p>
         </div>
 

@@ -14,8 +14,7 @@ import { UserDashboard } from './pages/dashboard/UserDashboard';
 import { UserProfileView } from './pages/profile/UserProfileView';
 import { UserProfileEdit } from './pages/profile/UserProfileEdit';
 import { GitHubVerificationPage } from './pages/verification/GitHubVerificationPage';
-import { PersonalizedQuizPage } from './pages/verification/PersonalizedQuizPage';
-import { QuizResultPage } from './pages/verification/QuizResultPage';
+
 import { FindTeamPage } from './pages/teams/FindTeamPage';
 import { TeamDetailPage } from './pages/teams/TeamDetailPage';
 import { InvitationsPage } from './pages/invitations/InvitationsPage';
@@ -87,22 +86,9 @@ export const App: React.FC = () => {
                     </ProtectedRoute>
                   }
                 />
-                <Route
-                  path="/quiz"
-                  element={
-                    <ProtectedRoute>
-                      <PersonalizedQuizPage />
-                    </ProtectedRoute>
-                  }
-                />
-                <Route
-                  path="/quiz/result"
-                  element={
-                    <ProtectedRoute>
-                      <QuizResultPage />
-                    </ProtectedRoute>
-                  }
-                />
+                {/* QUIZ REDIRECTS */}
+                <Route path="/quiz" element={<Navigate to="/dashboard" replace />} />
+                <Route path="/quiz/result" element={<Navigate to="/dashboard" replace />} />
                 <Route
                   path="/find-team"
                   element={
@@ -198,8 +184,8 @@ export const App: React.FC = () => {
                 <Route path="/candidate/my-team" element={<Navigate to="/my-teams" replace />} />
                 <Route path="/candidate/invitations" element={<Navigate to="/invitations" replace />} />
                 <Route path="/candidate/onboarding" element={<Navigate to="/profile/edit" replace />} />
-                <Route path="/candidate/quiz" element={<Navigate to="/quiz" replace />} />
-                <Route path="/candidate/quiz-result" element={<Navigate to="/quiz/result" replace />} />
+                <Route path="/candidate/quiz" element={<Navigate to="/dashboard" replace />} />
+                <Route path="/candidate/quiz-result" element={<Navigate to="/dashboard" replace />} />
                 <Route path="/leader/create-team" element={<Navigate to="/build-team" replace />} />
                 <Route path="/leader/discover" element={<Navigate to="/find-team" replace />} />
                 <Route path="/leader/team" element={<Navigate to="/my-teams" replace />} />

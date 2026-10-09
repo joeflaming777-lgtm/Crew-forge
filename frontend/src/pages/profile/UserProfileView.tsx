@@ -44,8 +44,6 @@ export const UserProfileView: React.FC = () => {
     { key: 'roles', label: 'Preferred Roles', completed: user.preferredRoles && user.preferredRoles.length >= 1, link: '/profile/edit' },
     { key: 'github', label: 'GitHub Username', completed: !!user.githubUsername, link: '/github' },
     { key: 'githubAnalysis', label: 'GitHub Analysis', completed: !!user.githubAnalysis, link: '/github' },
-    { key: 'quiz', label: 'Personalized Quiz', completed: !!(user.quizResults && user.quizResults.score > 0), link: '/quiz' },
-    { key: 'quizResult', label: 'Quiz Results', completed: !!user.isActivated, link: '/quiz/result' },
   ];
 
   return (
@@ -324,40 +322,36 @@ export const UserProfileView: React.FC = () => {
               )}
             </div>
 
-            {/* Quiz Result Card */}
+            {/* Hackathon Readiness Card */}
             <div className="glass-card" style={{ padding: '1.75rem', borderRadius: '20px', border: '1px solid rgba(255,255,255,0.08)' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <Award size={18} color="#38bdf8" />
-                  <span style={{ fontWeight: 700, color: '#f8fafc' }}>Personalized Skill Assessment</span>
+                  <Award size={18} color="#10b981" />
+                  <span style={{ fontWeight: 700, color: '#f8fafc' }}>Hackathon Readiness</span>
                 </div>
-                <Link to={user.quizResults ? '/quiz/result' : '/quiz'} style={{ fontSize: '0.8rem', color: '#38bdf8', fontWeight: 600 }}>
-                  {user.quizResults ? 'View Results →' : 'Take Quiz →'}
-                </Link>
+                <span style={{ fontSize: '0.8rem', color: user.availability === 'Available' ? '#10b981' : '#f59e0b', fontWeight: 600 }}>
+                  Status: {user.availability}
+                </span>
               </div>
 
-              {user.quizResults ? (
-                <div>
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
-                    <span style={{ fontSize: '0.9rem', color: '#cbd5e1' }}>
-                      Role: <strong>{user.quizResults.roleName}</strong>
-                    </span>
-                    <span style={{ fontSize: '1.2rem', fontWeight: 800, color: '#38bdf8' }}>
-                      {user.quizResults.score}/100
-                    </span>
-                  </div>
-                  <div style={{ fontSize: '0.8rem', color: '#64748b' }}>
-                    Completed on {new Date(user.quizResults.completedAt).toLocaleDateString()}
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px', marginBottom: '1rem' }}>
+                <div style={{ padding: '10px', background: 'rgba(255,255,255,0.03)', borderRadius: '12px' }}>
+                  <div style={{ fontSize: '0.75rem', color: '#94a3b8' }}>Hackathons</div>
+                  <div style={{ fontSize: '1.2rem', fontWeight: 800, color: '#f8fafc', marginTop: '2px' }}>
+                    {user.hackathonsCount} Attended
                   </div>
                 </div>
-              ) : (
-                <div style={{ textAlign: 'center', padding: '1rem 0', color: '#94a3b8' }}>
-                  <p style={{ fontSize: '0.875rem' }}>Assessment not completed yet.</p>
-                  <Link to="/quiz" className="btn-primary btn-sm" style={{ marginTop: '8px', display: 'inline-block' }}>
-                    Start 20-Min Assessment
-                  </Link>
+                <div style={{ padding: '10px', background: 'rgba(255,255,255,0.03)', borderRadius: '12px' }}>
+                  <div style={{ fontSize: '0.75rem', color: '#94a3b8' }}>Profile Completion</div>
+                  <div style={{ fontSize: '1.2rem', fontWeight: 800, color: '#10b981', marginTop: '2px' }}>
+                    {user.completionPercentage}%
+                  </div>
                 </div>
-              )}
+              </div>
+
+              <div style={{ fontSize: '0.85rem', color: '#cbd5e1', lineHeight: 1.5 }}>
+                {user.hackathonExperience || 'Looking to collaborate and build high-impact hackathon projects.'}
+              </div>
             </div>
           </div>
         </div>

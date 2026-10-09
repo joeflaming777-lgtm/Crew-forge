@@ -842,17 +842,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (!user) return;
     const updated = { ...user, ...updates };
 
-    // recalculate completion percentage
+    // recalculate completion percentage without quiz requirement
     let comp = 0;
-    if (updated.fullName && updated.college && updated.department) comp += 20;
-    if (updated.skills && updated.skills.length >= 2) comp += 15;
-    if (updated.preferredRoles && updated.preferredRoles.length >= 1) comp += 15;
-    if (updated.githubUsername) comp += 15;
+    if (updated.fullName && updated.college && updated.department) comp += 30;
+    if (updated.skills && updated.skills.length >= 2) comp += 25;
+    if (updated.preferredRoles && updated.preferredRoles.length >= 1) comp += 20;
+    if (updated.githubUsername) comp += 10;
     if (updated.githubAnalysis) comp += 15;
-    if (updated.quizResults && updated.quizResults.score > 0) comp += 20;
 
     updated.completionPercentage = Math.min(100, comp);
-    if (updated.completionPercentage >= 80) {
+    if (updated.completionPercentage >= 70) {
       updated.isActivated = true;
     }
 

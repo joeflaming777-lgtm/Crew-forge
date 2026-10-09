@@ -205,7 +205,7 @@ export const TeamCandidatesDiscovery: React.FC = () => {
             Candidate Discovery & Squad Matching
           </h1>
           <p style={{ fontSize: '1.05rem', color: '#94a3b8', marginTop: '6px', maxWidth: '780px' }}>
-            Discover and invite high-performing students verified via GitHub and personalized skill quizzes. Select candidates to compare metrics side-by-side.
+            Discover and invite high-performing students verified via GitHub and technical skill evaluation. Select candidates to compare metrics side-by-side.
           </p>
         </div>
 
@@ -588,9 +588,9 @@ export const TeamCandidatesDiscovery: React.FC = () => {
               {/* Scores Grid */}
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px', marginBottom: '1.5rem' }}>
                 <div style={{ padding: '10px 14px', borderRadius: '10px', background: 'rgba(56, 189, 248, 0.08)', border: '1px solid rgba(56, 189, 248, 0.2)' }}>
-                  <div style={{ fontSize: '0.75rem', color: '#94a3b8' }}>Quiz Score</div>
+                  <div style={{ fontSize: '0.75rem', color: '#94a3b8' }}>Verified Skills</div>
                   <div style={{ fontSize: '1.3rem', fontWeight: 800, color: '#38bdf8' }}>
-                    {selectedCandidate.quizScore}/100
+                    {selectedCandidate.skills.length} Skills
                   </div>
                 </div>
                 <div style={{ padding: '10px 14px', borderRadius: '10px', background: 'rgba(168, 85, 247, 0.08)', border: '1px solid rgba(168, 85, 247, 0.2)' }}>
@@ -779,8 +779,8 @@ export const TeamCandidatesDiscovery: React.FC = () => {
                     </div>
 
                     <div style={{ borderTop: '1px solid rgba(255,255,255,0.06)', paddingTop: '8px' }}>
-                      <div style={{ fontSize: '0.725rem', color: '#64748b', textTransform: 'uppercase' }}>Quiz Score</div>
-                      <div style={{ fontSize: '1.1rem', fontWeight: 800, color: '#38bdf8' }}>{cand.quizScore}/100</div>
+                      <div style={{ fontSize: '0.725rem', color: '#64748b', textTransform: 'uppercase' }}>Verified Skills</div>
+                      <div style={{ fontSize: '1.1rem', fontWeight: 800, color: '#38bdf8' }}>{cand.skills.length} Skills</div>
                     </div>
 
                     <div>

@@ -82,8 +82,6 @@ export const UserDashboard: React.FC = () => {
     { key: 'roles', label: 'Preferred Roles', link: '/profile/edit', completed: user.preferredRoles && user.preferredRoles.length >= 1 },
     { key: 'github', label: 'GitHub Username', link: '/github', completed: !!user.githubUsername },
     { key: 'githubAnalysis', label: 'GitHub Analysis', link: '/github', completed: !!user.githubAnalysis },
-    { key: 'quiz', label: 'Personalized Quiz', link: '/quiz', completed: !!(user.quizResults && user.quizResults.score > 0) },
-    { key: 'quizResult', label: 'Quiz Result', link: '/quiz/result', completed: !!user.isActivated },
   ];
 
   return (
@@ -453,9 +451,9 @@ export const UserDashboard: React.FC = () => {
               {/* Sub-Scores */}
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px', marginBottom: '1.25rem' }}>
                 <div style={{ padding: '10px', background: 'rgba(255,255,255,0.03)', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.06)' }}>
-                  <div style={{ fontSize: '0.75rem', color: '#94a3b8' }}>Quiz Score</div>
+                  <div style={{ fontSize: '0.75rem', color: '#94a3b8' }}>Verified Skills</div>
                   <div style={{ fontSize: '1.2rem', fontWeight: 800, color: '#38bdf8' }}>
-                    {user.quizScore > 0 ? `${user.quizScore}/100` : 'Not Taken'}
+                    {user.skills && user.skills.length > 0 ? `${user.skills.length} Skills` : 'None Added'}
                   </div>
                 </div>
                 <div style={{ padding: '10px', background: 'rgba(255,255,255,0.03)', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.06)' }}>

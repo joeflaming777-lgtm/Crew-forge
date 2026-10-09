@@ -248,7 +248,7 @@ export const GitHubVerificationPage: React.FC = () => {
               </span>
 
               <Link
-                to="/quiz"
+                to="/dashboard"
                 className="btn-primary"
                 style={{
                   display: 'flex',
@@ -257,7 +257,7 @@ export const GitHubVerificationPage: React.FC = () => {
                   padding: '0.85rem 1.6rem',
                 }}
               >
-                Proceed to Skill Assessment <ArrowRight size={18} />
+                Go to Dashboard <ArrowRight size={18} />
               </Link>
             </div>
           </motion.div>
