@@ -37,7 +37,7 @@ export const LoginPage: React.FC = () => {
     try {
       setLoading(true);
       await login(email, password, intent);
-      toast.success('Welcome back to HackMate!');
+      toast.success('Welcome back to SkillSync!');
       handleRedirectAfterAuth();
     } catch {
       toast.error('Login failed. Please check your credentials.');
@@ -179,7 +179,7 @@ export const LoginPage: React.FC = () => {
           <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '8px' }}>
             <button
               type="button"
-              onClick={() => fillDemoStudent('arjun@hackmate.dev', 'Arjun Sharma')}
+              onClick={() => fillDemoStudent('arjun@skillsync.dev', 'Arjun Sharma')}
               className="btn-secondary btn-sm"
               style={{
                 display: 'flex',
@@ -194,7 +194,7 @@ export const LoginPage: React.FC = () => {
             </button>
             <button
               type="button"
-              onClick={() => fillDemoStudent('priya@hackmate.dev', 'Priya Patel')}
+              onClick={() => fillDemoStudent('priya@skillsync.dev', 'Priya Patel')}
               className="btn-secondary btn-sm"
               style={{
                 display: 'flex',
@@ -209,7 +209,7 @@ export const LoginPage: React.FC = () => {
             </button>
             <button
               type="button"
-              onClick={() => fillDemoStudent('aarav@hackmate.dev', 'Aarav Mehta')}
+              onClick={() => fillDemoStudent('aarav@skillsync.dev', 'Aarav Mehta')}
               className="btn-secondary btn-sm"
               style={{
                 display: 'flex',

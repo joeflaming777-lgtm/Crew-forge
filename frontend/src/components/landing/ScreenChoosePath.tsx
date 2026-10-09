@@ -13,9 +13,9 @@ export const ScreenChoosePath: React.FC = () => {
   const handleQuickLogin = async (userKey: 'arjun' | 'priya' | 'aarav') => {
     try {
       const emailMap = {
-        arjun: 'arjun@hackmate.dev',
-        priya: 'priya@hackmate.dev',
-        aarav: 'aarav@hackmate.dev',
+        arjun: 'arjun@skillsync.dev',
+        priya: 'priya@skillsync.dev',
+        aarav: 'aarav@skillsync.dev',
       };
 
       const nameMap = {

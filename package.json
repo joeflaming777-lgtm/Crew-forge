@@ -1,7 +1,7 @@
 {
   "name": "hackmate-monorepo",
   "version": "1.0.0",
-  "description": "HackMate - Smart Hackathon Team Formation & Candidate Selection Platform",
+  "description": "SkillSync - Smart Hackathon Team Formation & Candidate Selection Platform",
   "private": true,
   "workspaces": [
     "backend",

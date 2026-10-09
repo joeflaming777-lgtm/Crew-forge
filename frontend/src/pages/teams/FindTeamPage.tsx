@@ -147,7 +147,7 @@ export const FindTeamPage: React.FC = () => {
         >
           <Info size={20} color="#818cf8" style={{ flexShrink: 0 }} />
           <span style={{ fontSize: '0.875rem', color: '#cbd5e1' }}>
-            <strong>Invitation-Based Membership:</strong> HackMate uses a merit-based invitation model. View any team's details to see what skills and positions they require. Team Owners discover active students and send invitations directly to your dashboard inbox.
+            <strong>Invitation-Based Membership:</strong> SkillSync uses a merit-based invitation model. View any team's details to see what skills and positions they require. Team Owners discover active students and send invitations directly to your dashboard inbox.
           </span>
         </div>
 

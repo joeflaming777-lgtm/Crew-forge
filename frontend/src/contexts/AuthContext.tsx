@@ -71,13 +71,13 @@ interface AuthContextType {
   isAdmin: boolean;
 }
 
-const STORAGE_KEY = 'hackmate_app_state_v3';
+const STORAGE_KEY = 'skillsync_app_state_v1';
 
 // INITIAL SEED DATA
 const SEED_USERS: User[] = [
   {
     id: 'user-arjun',
-    email: 'arjun@hackmate.dev',
+    email: 'arjun@skillsync.dev',
     fullName: 'Arjun Sharma',
     avatarUrl: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80',
     phone: '+91 98765 43210',
@@ -130,7 +130,7 @@ const SEED_USERS: User[] = [
     githubScore: 86,
     skillMatchScore: 90,
     experienceScore: 84,
-    linkedIn: 'https://linkedin.com/in/arjun-sharma-hackmate',
+    linkedIn: 'https://linkedin.com/in/arjun-sharma-skillsync',
     isActivated: true,
     completionPercentage: 94,
     verificationSteps: {
@@ -186,7 +186,7 @@ const SEED_USERS: User[] = [
   },
   {
     id: 'user-priya',
-    email: 'priya@hackmate.dev',
+    email: 'priya@skillsync.dev',
     fullName: 'Priya Patel',
     avatarUrl: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150&auto=format&fit=crop&q=80',
     phone: '+91 98111 22334',
@@ -277,7 +277,7 @@ const SEED_USERS: User[] = [
   },
   {
     id: 'user-aarav',
-    email: 'aarav@hackmate.dev',
+    email: 'aarav@skillsync.dev',
     fullName: 'Aarav Mehta',
     avatarUrl: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&auto=format&fit=crop&q=80',
     phone: '+91 99887 76655',
@@ -361,7 +361,7 @@ const SEED_USERS: User[] = [
   },
   {
     id: 'user-sneha',
-    email: 'sneha@hackmate.dev',
+    email: 'sneha@skillsync.dev',
     fullName: 'Sneha Rao',
     avatarUrl: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=150&auto=format&fit=crop&q=80',
     college: 'IIIT Hyderabad',
@@ -404,7 +404,7 @@ const SEED_USERS: User[] = [
   },
   {
     id: 'user-vikram',
-    email: 'vikram@hackmate.dev',
+    email: 'vikram@skillsync.dev',
     fullName: 'Vikram Desai',
     avatarUrl: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&auto=format&fit=crop&q=80',
     college: 'NIT Trichy',
@@ -456,7 +456,7 @@ const SEED_TEAMS: Team[] = [
     description: 'Developing an automated AI-driven multi-lingual crop disease detection & advisory system for rural farmers.',
     ownerId: 'user-arjun',
     ownerName: 'Arjun Sharma',
-    ownerEmail: 'arjun@hackmate.dev',
+    ownerEmail: 'arjun@skillsync.dev',
     ownerAvatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80',
     maxTeamSize: 6,
     currentMemberCount: 3,
@@ -473,7 +473,7 @@ const SEED_TEAMS: Team[] = [
         id: 'tm-1',
         userId: 'user-arjun',
         fullName: 'Arjun Sharma',
-        email: 'arjun@hackmate.dev',
+        email: 'arjun@skillsync.dev',
         avatarUrl: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80',
         assignedRole: 'Team Owner & AI Lead',
         isOwner: true,
@@ -486,7 +486,7 @@ const SEED_TEAMS: Team[] = [
         id: 'tm-2',
         userId: 'user-sneha',
         fullName: 'Sneha Rao',
-        email: 'sneha@hackmate.dev',
+        email: 'sneha@skillsync.dev',
         avatarUrl: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=150&auto=format&fit=crop&q=80',
         assignedRole: 'Mobile Developer',
         isOwner: false,
@@ -499,7 +499,7 @@ const SEED_TEAMS: Team[] = [
         id: 'tm-3',
         userId: 'user-vikram',
         fullName: 'Vikram Desai',
-        email: 'vikram@hackmate.dev',
+        email: 'vikram@skillsync.dev',
         avatarUrl: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&auto=format&fit=crop&q=80',
         assignedRole: 'Backend Engineer',
         isOwner: false,
@@ -543,7 +543,7 @@ const SEED_TEAMS: Team[] = [
         id: 'tm-bf-2',
         userId: 'user-arjun',
         fullName: 'Arjun Sharma',
-        email: 'arjun@hackmate.dev',
+        email: 'arjun@skillsync.dev',
         avatarUrl: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80',
         assignedRole: 'Full Stack Developer',
         isOwner: false,
@@ -556,7 +556,7 @@ const SEED_TEAMS: Team[] = [
         id: 'tm-bf-3',
         userId: 'user-sneha',
         fullName: 'Sneha Rao',
-        email: 'sneha@hackmate.dev',
+        email: 'sneha@skillsync.dev',
         avatarUrl: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=150&auto=format&fit=crop&q=80',
         assignedRole: 'Mobile Architect',
         isOwner: false,
@@ -572,7 +572,7 @@ const SEED_TEAMS: Team[] = [
     description: 'Low-latency distributed vector search indexing engine optimized for edge devices and Raspberry Pi clusters.',
     ownerId: 'user-aarav',
     ownerName: 'Aarav Mehta',
-    ownerEmail: 'aarav@hackmate.dev',
+    ownerEmail: 'aarav@skillsync.dev',
     ownerAvatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&auto=format&fit=crop&q=80',
     maxTeamSize: 4,
     currentMemberCount: 2,
@@ -587,7 +587,7 @@ const SEED_TEAMS: Team[] = [
         id: 'tm-nn-1',
         userId: 'user-aarav',
         fullName: 'Aarav Mehta',
-        email: 'aarav@hackmate.dev',
+        email: 'aarav@skillsync.dev',
         avatarUrl: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&auto=format&fit=crop&q=80',
         assignedRole: 'Team Owner & DevOps Lead',
         isOwner: true,
@@ -637,7 +637,7 @@ const SEED_INVITATIONS: Invitation[] = [
     ownerName: 'Arjun Sharma',
     candidateId: 'user-priya',
     candidateName: 'Priya Patel',
-    candidateEmail: 'priya@hackmate.dev',
+    candidateEmail: 'priya@skillsync.dev',
     roleName: 'UI/UX Designer',
     message: 'Hey Priya! We loved your CanvasCraft portfolio and would love for you to head UI/UX and interactive frontend for our SIH agriculture platform.',
     status: 'PENDING',
@@ -652,9 +652,9 @@ const SEED_INVITATIONS: Invitation[] = [
     ownerName: 'Maya Iyer',
     candidateId: 'user-arjun',
     candidateName: 'Arjun Sharma',
-    candidateEmail: 'arjun@hackmate.dev',
+    candidateEmail: 'arjun@skillsync.dev',
     roleName: 'AI / Backend Developer',
-    message: 'Hi Arjun, we saw your ML pruning paper and stellar score on HackMate. Would you be open to collaborating on our ZK identity engine?',
+    message: 'Hi Arjun, we saw your ML pruning paper and stellar score on SkillSync. Would you be open to collaborating on our ZK identity engine?',
     status: 'PENDING',
     createdAt: '2026-03-24T15:45:00Z',
   },
@@ -754,14 +754,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           })
         );
       } catch (e) {
-        console.warn('Failed to save HackMate state to localStorage', e);
+        console.warn('Failed to save SkillSync state to localStorage', e);
       }
     }
   }, [allUsers, teams, invitations, notifications, user, loading]);
 
   const login = async (email?: string, password?: string, intent?: string): Promise<boolean> => {
     // If no email given or demo clicked, match user by email or fallback to Arjun
-    const targetEmail = email ? email.trim().toLowerCase() : 'arjun@hackmate.dev';
+    const targetEmail = email ? email.trim().toLowerCase() : 'arjun@skillsync.dev';
     const matched = allUsers.find((u) => u.email.toLowerCase() === targetEmail) || allUsers[0];
 
     setUser(matched);

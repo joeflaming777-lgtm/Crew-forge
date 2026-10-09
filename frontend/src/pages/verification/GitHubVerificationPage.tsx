@@ -59,7 +59,7 @@ export const GitHubVerificationPage: React.FC = () => {
             GitHub Skill Verification
           </h1>
           <p style={{ fontSize: '1.05rem', color: '#94a3b8', marginTop: '4px' }}>
-            Analyze repository breadth, commit frequency, code documentation, and language mastery to power your HackMate match score.
+            Analyze repository breadth, commit frequency, code documentation, and language mastery to power your SkillSync match score.
           </p>
         </div>
 

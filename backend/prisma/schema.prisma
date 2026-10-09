@@ -1,4 +1,4 @@
-// Prisma schema for HackMate
+// Prisma schema for SkillSync
 // SQLite default for zero-setup portability, easily switchable to PostgreSQL
 
 generator client {

@@ -1,8 +1,8 @@
-# HackMate
+# SkillSync
 
 > **Find Your People. Build Your Team.**
 
-HackMate is an intelligent hackathon team formation and candidate selection web platform designed for college students participating in hackathons such as the Smart India Hackathon (SIH).
+SkillSync is an intelligent hackathon team formation and candidate selection web platform designed for college students participating in hackathons such as the Smart India Hackathon (SIH).
 
 [![React](https://img.shields.io/badge/Frontend-React%2018%20%2B%20Vite-61DAFB?logo=react&logoColor=black)](https://react.dev/)
 [![TypeScript](https://img.shields.io/badge/Language-TypeScript%205-3178C6?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
@@ -14,7 +14,7 @@ HackMate is an intelligent hackathon team formation and candidate selection web 
 
 ## 🔒 Unified User Model (Single Login)
 
-HackMate uses a **single, unified User Login (`/login`)** for all students and participants. There are no split or separate logins:
+SkillSync uses a **single, unified User Login (`/login`)** for all students and participants. There are no split or separate logins:
 
 - Every student registers and logs in through one single authentication portal.
 - Every user account has full access to:
@@ -26,8 +26,8 @@ HackMate uses a **single, unified User Login (`/login`)** for all students and p
 ## 🌟 Key Platform Features
 
 ### 1. Website Entry Experience
-- **Screen 1: Hero / Project Reveal**: Centered HackMate logo reveal, tagline *"Find Your People. Build Your Team."*, ambient particle motion, and *"Swipe up to explore ↑"* indicator.
-- **Screen 2: Why HackMate?**: Clear problem and solution statements with 4 interactive feature cards (**Discover**, **Evaluate**, **Match**, **Build**).
+- **Screen 1: Hero / Project Reveal**: Centered SkillSync logo reveal, tagline *"Find Your People. Build Your Team."*, ambient particle motion, and *"Swipe up to explore ↑"* indicator.
+- **Screen 2: Why SkillSync?**: Clear problem and solution statements with 4 interactive feature cards (**Discover**, **Evaluate**, **Match**, **Build**).
 - **Screen 3: Unified Platform**: Overview of platform capabilities (**Join Teams** & **Build Teams**) with 1-click instant User Login buttons for rapid evaluation.
 
 ### 2. Candidate & Teammate Features (Find & Join Teams)
@@ -164,10 +164,10 @@ Open **[http://localhost:5173/login](http://localhost:5173/login)** to access th
 
 | Account | Email | Password | Role & Permissions |
 |---|---|---|---|
-| **Demo User: Arjun Sharma** | `arjun@hackmate.dev` | `student123` | Active User: Both Team Owner & Member (IIT Bombay, CSE) |
-| **Demo User: Priya Patel** | `priya@hackmate.dev` | `student123` | Active User: Candidate looking for a team (BITS Pilani) |
-| **Demo User: Aarav Mehta** | `aarav@hackmate.dev` | `student123` | Active User: Team Owner of NeuralNomads (SIH 2026) |
-| **Platform Admin** | `admin@hackmate.dev` | `admin123` | HackMate Platform Admin Console |
+| **Demo User: Arjun Sharma** | `arjun@skillsync.dev` | `student123` | Active User: Both Team Owner & Member (IIT Bombay, CSE) |
+| **Demo User: Priya Patel** | `priya@skillsync.dev` | `student123` | Active User: Candidate looking for a team (BITS Pilani) |
+| **Demo User: Aarav Mehta** | `aarav@skillsync.dev` | `student123` | Active User: Team Owner of NeuralNomads (SIH 2026) |
+| **Platform Admin** | `admin@skillsync.dev` | `admin123` | SkillSync Platform Admin Console |
 
 ---
 
