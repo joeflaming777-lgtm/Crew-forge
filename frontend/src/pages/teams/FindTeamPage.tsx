@@ -122,7 +122,7 @@ export const FindTeamPage: React.FC = () => {
         {/* Header */}
         <div style={{ marginBottom: '2rem' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#818cf8', fontSize: '0.875rem', fontWeight: 700, textTransform: 'uppercase', marginBottom: '6px' }}>
-            <Compass size={16} /> Candidate Discovery Portal
+            <Compass size={16} /> Find a Team
           </div>
           <h1 style={{ fontSize: 'clamp(2rem, 3.5vw, 2.75rem)', fontWeight: 800, color: '#f8fafc', letterSpacing: '-0.02em' }}>
             Find a Hackathon Team
