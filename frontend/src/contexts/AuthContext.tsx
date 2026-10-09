@@ -71,7 +71,7 @@ interface AuthContextType {
   isAdmin: boolean;
 }
 
-const STORAGE_KEY = 'hackmate_app_state_v2';
+const STORAGE_KEY = 'hackmate_app_state_v3';
 
 // INITIAL SEED DATA
 const SEED_USERS: User[] = [
@@ -708,6 +708,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   // Initialize or restore state from localStorage
   useEffect(() => {
     try {
+      // Clear legacy storage tokens and sessions
+      localStorage.removeItem('skillsync_token');
+      localStorage.removeItem('skillsync_user');
+      localStorage.removeItem('hackmate_token');
+      localStorage.removeItem('hackmate_user');
+      localStorage.removeItem('hackmate_app_state_v2');
+
       const savedState = localStorage.getItem(STORAGE_KEY);
       if (savedState) {
         const parsed = JSON.parse(savedState);
@@ -715,19 +722,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         if (parsed.teams) setTeams(parsed.teams);
         if (parsed.invitations) setInvitations(parsed.invitations);
         if (parsed.notifications) setNotifications(parsed.notifications);
+        // Clean already logged-in account from saved state
         if (parsed.currentUser) {
-          setUser(parsed.currentUser);
-          setToken('mock-jwt-token-active');
+          delete parsed.currentUser;
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(parsed));
         }
-      } else {
-        // Default to Arjun Sharma for instant rich demo experience
-        const defaultUser = SEED_USERS[0];
-        setUser(defaultUser);
-        setToken('mock-jwt-token-active');
       }
+      // Start in a clean logged-out state
+      setUser(null);
+      setToken(null);
     } catch {
-      setUser(SEED_USERS[0]);
-      setToken('mock-jwt-token-active');
+      setUser(null);
+      setToken(null);
     } finally {
       setLoading(false);
     }
@@ -816,6 +822,20 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const logout = () => {
     setUser(null);
     setToken(null);
+    try {
+      localStorage.removeItem('skillsync_token');
+      localStorage.removeItem('skillsync_user');
+      localStorage.removeItem('hackmate_token');
+      localStorage.removeItem('hackmate_user');
+      const savedState = localStorage.getItem(STORAGE_KEY);
+      if (savedState) {
+        const parsed = JSON.parse(savedState);
+        delete parsed.currentUser;
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(parsed));
+      }
+    } catch (e) {
+      console.warn('Failed to clean auth state on logout', e);
+    }
   };
 
   const updateProfile = (updates: Partial<User>) => {
