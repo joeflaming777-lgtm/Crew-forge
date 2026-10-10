@@ -62,6 +62,7 @@ model CandidateProfile {
   quizAttempts         QuizAttempt[]
   teamMemberships      TeamMember[]
   invitations          Invitation[]
+  joinRequests         JoinRequest[]
 
   @@index([department])
   @@index([overallScore])
@@ -166,6 +167,7 @@ model Team {
   requirements       TeamRequirement[]
   members            TeamMember[]
   invitations        Invitation[]
+  joinRequests       JoinRequest[]
 
   @@index([hackathonId])
   @@index([leaderProfileId])
@@ -191,6 +193,7 @@ model TeamMember {
   candidateProfileId String
   candidate          CandidateProfile @relation(fields: [candidateProfileId], references: [id], onDelete: Cascade)
   assignedRole       String
+  isOwner            Boolean          @default(false)
   joinedAt           DateTime         @default(now())
 
   @@unique([teamId, candidateProfileId])
@@ -207,6 +210,24 @@ model Invitation {
   roleName           String
   message            String?
   status             String           @default("PENDING") // PENDING, ACCEPTED, DECLINED, EXPIRED, CANCELLED
+  createdAt          DateTime         @default(now())
+  updatedAt          DateTime         @updatedAt
+  respondedAt        DateTime?
+
+  @@index([candidateProfileId])
+  @@index([teamId])
+  @@index([status])
+}
+
+model JoinRequest {
+  id                 String           @id @default(uuid())
+  teamId             String
+  team               Team             @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  candidateProfileId String
+  candidate          CandidateProfile @relation(fields: [candidateProfileId], references: [id], onDelete: Cascade)
+  roleName           String
+  message            String?
+  status             String           @default("PENDING") // PENDING, APPROVED, DECLINED, CANCELLED
   createdAt          DateTime         @default(now())
   updatedAt          DateTime         @updatedAt
   respondedAt        DateTime?

@@ -44,11 +44,18 @@ router.get('/quiz/start', authenticate, authorizeRoles('candidate'), QuizControl
 router.post('/quiz/submit', authenticate, authorizeRoles('candidate'), QuizController.submitQuiz);
 router.get('/quiz/result', authenticate, authorizeRoles('candidate'), QuizController.getLatestResult);
 
-// ==================== TEAMS ROUTES ====================
-router.post('/teams', authenticate, authorizeRoles('team_leader'), TeamController.createTeam);
+// ==================== TEAMS & JOIN REQUESTS ROUTES ====================
+router.post('/teams', authenticate, TeamController.createTeam);
 router.get('/teams', TeamController.getAllTeams);
-router.get('/teams/my-team', authenticate, authorizeRoles('team_leader'), TeamController.getMyTeam);
+router.get('/teams/my-team', authenticate, TeamController.getMyTeam);
 router.get('/teams/:id', TeamController.getTeamById);
+router.post('/teams/:id/join-requests', authenticate, TeamController.createJoinRequest);
+router.get('/teams/:id/join-requests', authenticate, TeamController.getTeamJoinRequests);
+router.get('/join-requests/my-sent', authenticate, TeamController.getMySentJoinRequests);
+router.put('/join-requests/:id/approve', authenticate, TeamController.approveJoinRequest);
+router.put('/join-requests/:id/decline', authenticate, TeamController.declineJoinRequest);
+router.delete('/join-requests/:id/cancel', authenticate, TeamController.cancelJoinRequest);
+router.delete('/teams/:id/members/:memberId', authenticate, TeamController.removeTeamMember);
 
 // ==================== CANDIDATE DISCOVERY (LEADER) ====================
 router.get('/candidates', authenticate, DiscoveryController.discoverCandidates);

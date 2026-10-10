@@ -2,7 +2,9 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 import {
   User,
   Team,
+  TeamMember,
   Invitation,
+  JoinRequest,
   Notification,
   GitHubAnalysis,
   QuizResult,
@@ -38,13 +40,25 @@ interface AuthContextType {
   }) => Team;
   updateTeam: (teamId: string, updates: Partial<Team>) => void;
   getTeamById: (teamId: string) => Team | undefined;
+  removeTeamMember: (teamId: string, memberUserId: string) => void;
+  leaveTeam: (teamId: string) => void;
+
+  // Join Requests
+  joinRequests: JoinRequest[];
+  mySentJoinRequests: JoinRequest[];
+  getJoinRequestsForTeam: (teamId: string) => JoinRequest[];
+  allMyReceivedJoinRequests: JoinRequest[];
+  createJoinRequest: (teamId: string, roleName: string, message?: string) => { success: boolean; message: string };
+  approveJoinRequest: (requestId: string) => { success: boolean; message: string };
+  declineJoinRequest: (requestId: string) => void;
+  cancelJoinRequest: (requestId: string) => void;
 
   // Invitations
   invitations: Invitation[];
   myReceivedInvitations: Invitation[];
   mySentInvitations: (teamId?: string) => Invitation[];
   sendInvitation: (teamId: string, candidateId: string, roleName: string, message: string) => boolean;
-  acceptInvitation: (invitationId: string) => void;
+  acceptInvitation: (invitationId: string) => { success: boolean; message: string };
   declineInvitation: (invitationId: string) => void;
   cancelInvitation: (invitationId: string) => void;
 
@@ -660,6 +674,47 @@ const SEED_INVITATIONS: Invitation[] = [
   },
 ];
 
+const SEED_JOIN_REQUESTS: JoinRequest[] = [
+  {
+    id: 'req-1',
+    teamId: 'team-innovators',
+    teamName: 'Innovators',
+    hackathonName: 'Smart India Hackathon 2026',
+    ownerId: 'user-arjun',
+    candidateId: 'user-priya',
+    candidateName: 'Priya Patel',
+    candidateEmail: 'priya@skillsync.dev',
+    candidateAvatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150&auto=format&fit=crop&q=80',
+    candidateDepartment: 'Information Technology',
+    candidateCollege: 'BITS Pilani',
+    candidateScore: 85,
+    candidateSkills: ['React', 'Figma', 'TypeScript', 'Tailwind CSS'],
+    roleName: 'UI/UX Designer',
+    message: 'I have extensive experience designing interactive UI components and would love to collaborate on Innovators for SIH!',
+    status: 'PENDING',
+    createdAt: '2026-03-23T14:20:00Z',
+  },
+  {
+    id: 'req-2',
+    teamId: 'team-neuralnomads',
+    teamName: 'NeuralNomads',
+    hackathonName: 'HackMIT 2026',
+    ownerId: 'user-aarav',
+    candidateId: 'user-arjun',
+    candidateName: 'Arjun Sharma',
+    candidateEmail: 'arjun@skillsync.dev',
+    candidateAvatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80',
+    candidateDepartment: 'Computer Science and Engineering',
+    candidateCollege: 'IIT Bombay',
+    candidateScore: 88,
+    candidateSkills: ['Python', 'PyTorch', 'Rust', 'Docker'],
+    roleName: 'Rust Systems Engineer',
+    message: 'Excited about edge vector search. I have worked on distributed systems and would love to contribute to NeuralNomads.',
+    status: 'PENDING',
+    createdAt: '2026-03-24T09:15:00Z',
+  },
+];
+
 const SEED_NOTIFICATIONS: Notification[] = [
   {
     id: 'notif-1',
@@ -703,6 +758,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [allUsers, setAllUsers] = useState<User[]>(SEED_USERS);
   const [teams, setTeams] = useState<Team[]>(SEED_TEAMS);
   const [invitations, setInvitations] = useState<Invitation[]>(SEED_INVITATIONS);
+  const [joinRequests, setJoinRequests] = useState<JoinRequest[]>(SEED_JOIN_REQUESTS);
   const [notifications, setNotifications] = useState<Notification[]>(SEED_NOTIFICATIONS);
 
   // Initialize or restore state from localStorage
@@ -721,6 +777,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         if (parsed.allUsers) setAllUsers(parsed.allUsers);
         if (parsed.teams) setTeams(parsed.teams);
         if (parsed.invitations) setInvitations(parsed.invitations);
+        if (parsed.joinRequests) setJoinRequests(parsed.joinRequests);
         if (parsed.notifications) setNotifications(parsed.notifications);
         // Clean already logged-in account from saved state
         if (parsed.currentUser) {
@@ -749,6 +806,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             allUsers,
             teams,
             invitations,
+            joinRequests,
             notifications,
             currentUser: user,
           })
@@ -757,7 +815,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         console.warn('Failed to save SkillSync state to localStorage', e);
       }
     }
-  }, [allUsers, teams, invitations, notifications, user, loading]);
+  }, [allUsers, teams, invitations, joinRequests, notifications, user, loading]);
 
   const login = async (email?: string, password?: string, intent?: string): Promise<boolean> => {
     // If no email given or demo clicked, match user by email or fallback to Arjun
@@ -949,6 +1007,266 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return teams.find((t) => t.id === teamId);
   };
 
+  const removeTeamMember = (teamId: string, memberUserId: string) => {
+    const targetTeam = teams.find((t) => t.id === teamId);
+    if (!targetTeam || !user) return;
+    if (targetTeam.ownerId !== user.id) return;
+
+    const memberToRemove = targetTeam.members.find((m) => m.userId === memberUserId);
+    if (!memberToRemove || memberToRemove.isOwner) return;
+
+    setTeams((prev) =>
+      prev.map((t) => {
+        if (t.id === teamId) {
+          const updatedMembers = t.members.filter((m) => m.userId !== memberUserId);
+          const restoredRole = memberToRemove.assignedRole;
+          const openRoles =
+            restoredRole && !t.openRoles.includes(restoredRole)
+              ? [...t.openRoles, restoredRole]
+              : t.openRoles;
+          return {
+            ...t,
+            members: updatedMembers,
+            currentMemberCount: updatedMembers.length,
+            openRoles,
+            status: 'Recruiting',
+          };
+        }
+        return t;
+      })
+    );
+
+    // Notify removed member
+    const notif: Notification = {
+      id: 'notif-' + Date.now(),
+      userId: memberUserId,
+      title: 'Team Membership Update',
+      message: `You have been removed from team "${targetTeam.name}".`,
+      type: 'TEAM_UPDATE',
+      link: '/my-teams',
+      isRead: false,
+      createdAt: new Date().toISOString(),
+    };
+    setNotifications((prev) => [notif, ...prev]);
+  };
+
+  const leaveTeam = (teamId: string) => {
+    const targetTeam = teams.find((t) => t.id === teamId);
+    if (!targetTeam || !user) return;
+
+    const memberRecord = targetTeam.members.find((m) => m.userId === user.id);
+    if (!memberRecord || memberRecord.isOwner) return;
+
+    setTeams((prev) =>
+      prev.map((t) => {
+        if (t.id === teamId) {
+          const updatedMembers = t.members.filter((m) => m.userId !== user.id);
+          const restoredRole = memberRecord.assignedRole;
+          const openRoles =
+            restoredRole && !t.openRoles.includes(restoredRole)
+              ? [...t.openRoles, restoredRole]
+              : t.openRoles;
+          return {
+            ...t,
+            members: updatedMembers,
+            currentMemberCount: updatedMembers.length,
+            openRoles,
+            status: 'Recruiting',
+          };
+        }
+        return t;
+      })
+    );
+
+    // Notify owner
+    const ownerNotif: Notification = {
+      id: 'notif-' + Date.now(),
+      userId: targetTeam.ownerId,
+      title: 'Team Member Left',
+      message: `${user.fullName} has left team "${targetTeam.name}".`,
+      type: 'TEAM_UPDATE',
+      link: `/team/${targetTeam.id}`,
+      isRead: false,
+      createdAt: new Date().toISOString(),
+    };
+    setNotifications((prev) => [ownerNotif, ...prev]);
+  };
+
+  // Join Requests
+  const createJoinRequest = (
+    teamId: string,
+    roleName: string,
+    message?: string
+  ): { success: boolean; message: string } => {
+    if (!user) return { success: false, message: 'You must be logged in to request to join a team.' };
+
+    const targetTeam = teams.find((t) => t.id === teamId);
+    if (!targetTeam) return { success: false, message: 'Team not found.' };
+
+    if (targetTeam.members.some((m) => m.userId === user.id)) {
+      return { success: false, message: 'You are already a member of this team.' };
+    }
+
+    if (targetTeam.members.length >= targetTeam.maxTeamSize) {
+      return { success: false, message: 'This team has already reached its maximum member limit.' };
+    }
+
+    const existingPending = joinRequests.find(
+      (r) => r.teamId === teamId && r.candidateId === user.id && r.status === 'PENDING'
+    );
+    if (existingPending) {
+      return { success: false, message: 'You already have an active pending join request for this team.' };
+    }
+
+    const assignedRole = roleName || targetTeam.openRoles[0] || 'Member';
+
+    const newReq: JoinRequest = {
+      id: 'req-' + Date.now(),
+      teamId: targetTeam.id,
+      teamName: targetTeam.name,
+      hackathonName: targetTeam.hackathonName,
+      ownerId: targetTeam.ownerId,
+      candidateId: user.id,
+      candidateName: user.fullName,
+      candidateEmail: user.email,
+      candidateAvatar: user.avatarUrl,
+      candidateDepartment: user.department,
+      candidateCollege: user.college,
+      candidateScore: user.overallSkillScore,
+      candidateSkills: user.skills ? user.skills.map((s) => s.name) : [],
+      roleName: assignedRole,
+      message: message || `Hi! I would love to join ${targetTeam.name} as a ${assignedRole}.`,
+      status: 'PENDING',
+      createdAt: new Date().toISOString(),
+    };
+
+    setJoinRequests((prev) => [newReq, ...prev]);
+
+    // Send notification to team owner
+    const ownerNotif: Notification = {
+      id: 'notif-' + Date.now(),
+      userId: targetTeam.ownerId,
+      title: 'New Join Request Received! 🙋',
+      message: `${user.fullName} requested to join "${targetTeam.name}" as ${assignedRole}.`,
+      type: 'JOIN_REQUEST',
+      link: `/team/${targetTeam.id}`,
+      isRead: false,
+      createdAt: new Date().toISOString(),
+    };
+    setNotifications((prev) => [ownerNotif, ...prev]);
+
+    return { success: true, message: `Your join request for ${targetTeam.name} has been sent to the team owner!` };
+  };
+
+  const approveJoinRequest = (requestId: string): { success: boolean; message: string } => {
+    const req = joinRequests.find((r) => r.id === requestId);
+    if (!req || !user) return { success: false, message: 'Request not found.' };
+
+    const targetTeam = teams.find((t) => t.id === req.teamId);
+    if (!targetTeam) return { success: false, message: 'Team not found.' };
+
+    if (targetTeam.ownerId !== user.id) {
+      return { success: false, message: 'Only the team owner can approve join requests.' };
+    }
+
+    if (targetTeam.members.length >= targetTeam.maxTeamSize) {
+      return { success: false, message: 'Cannot approve request: Team is already at maximum capacity.' };
+    }
+
+    if (targetTeam.members.some((m) => m.userId === req.candidateId)) {
+      setJoinRequests((prev) =>
+        prev.map((r) => (r.id === requestId ? { ...r, status: 'APPROVED', respondedAt: new Date().toISOString() } : r))
+      );
+      return { success: false, message: 'Student is already a member of this team.' };
+    }
+
+    // Update request status
+    setJoinRequests((prev) =>
+      prev.map((r) =>
+        r.id === requestId ? { ...r, status: 'APPROVED', respondedAt: new Date().toISOString() } : r
+      )
+    );
+
+    // Add candidate to team members
+    setTeams((prev) =>
+      prev.map((t) => {
+        if (t.id === req.teamId) {
+          const updatedMembers: TeamMember[] = [
+            ...t.members,
+            {
+              id: 'tm-' + Date.now(),
+              userId: req.candidateId,
+              fullName: req.candidateName,
+              email: req.candidateEmail,
+              avatarUrl: req.candidateAvatar,
+              assignedRole: req.roleName,
+              isOwner: false,
+              joinedAt: new Date().toISOString(),
+              department: req.candidateDepartment,
+              overallScore: req.candidateScore,
+            },
+          ];
+
+          const remainingOpenRoles = t.openRoles.filter((r) => r !== req.roleName);
+
+          return {
+            ...t,
+            members: updatedMembers,
+            currentMemberCount: updatedMembers.length,
+            openRoles: remainingOpenRoles,
+            status: updatedMembers.length >= t.maxTeamSize ? 'Full' : 'Recruiting',
+          };
+        }
+        return t;
+      })
+    );
+
+    // Send notification to candidate
+    const candNotif: Notification = {
+      id: 'notif-' + Date.now(),
+      userId: req.candidateId,
+      title: 'Join Request Approved! 🎉',
+      message: `Your request to join "${req.teamName}" as ${req.roleName} has been approved! You are now an official team member.`,
+      type: 'JOIN_APPROVED',
+      link: '/my-teams',
+      isRead: false,
+      createdAt: new Date().toISOString(),
+    };
+    setNotifications((prev) => [candNotif, ...prev]);
+
+    return { success: true, message: `${req.candidateName} has been added to the team!` };
+  };
+
+  const declineJoinRequest = (requestId: string) => {
+    const req = joinRequests.find((r) => r.id === requestId);
+    if (!req) return;
+
+    setJoinRequests((prev) =>
+      prev.map((r) =>
+        r.id === requestId ? { ...r, status: 'DECLINED', respondedAt: new Date().toISOString() } : r
+      )
+    );
+
+    // Send notification to candidate
+    const candNotif: Notification = {
+      id: 'notif-' + Date.now(),
+      userId: req.candidateId,
+      title: 'Join Request Update',
+      message: `Your request to join team "${req.teamName}" as ${req.roleName} was declined by the team owner.`,
+      type: 'JOIN_DECLINED',
+      link: '/find-team',
+      isRead: false,
+      createdAt: new Date().toISOString(),
+    };
+    setNotifications((prev) => [candNotif, ...prev]);
+  };
+
+  const cancelJoinRequest = (requestId: string) => {
+    setJoinRequests((prev) =>
+      prev.map((r) => (r.id === requestId ? { ...r, status: 'CANCELLED' } : r))
+    );
+  };
+
   // Invitations
   const sendInvitation = (
     teamId: string,
@@ -1003,9 +1321,27 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return true;
   };
 
-  const acceptInvitation = (invitationId: string) => {
+  const acceptInvitation = (invitationId: string): { success: boolean; message: string } => {
     const inv = invitations.find((i) => i.id === invitationId);
-    if (!inv || !user) return;
+    if (!inv || !user) return { success: false, message: 'Invitation not found' };
+
+    const targetTeam = teams.find((t) => t.id === inv.teamId);
+    if (!targetTeam) return { success: false, message: 'Team no longer exists' };
+
+    if (targetTeam.members.length >= targetTeam.maxTeamSize) {
+      return { success: false, message: 'Cannot accept invitation: Team has already reached maximum capacity.' };
+    }
+
+    if (targetTeam.members.some((m) => m.userId === user.id)) {
+      setInvitations((prev) =>
+        prev.map((i) =>
+          i.id === invitationId
+            ? { ...i, status: 'ACCEPTED', respondedAt: new Date().toISOString() }
+            : i
+        )
+      );
+      return { success: true, message: 'You are already an official member of this team.' };
+    }
 
     // Update invitation status
     setInvitations((prev) =>
@@ -1020,9 +1356,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setTeams((prev) =>
       prev.map((t) => {
         if (t.id === inv.teamId) {
-          const alreadyMember = t.members.some((m) => m.userId === user.id);
-          if (alreadyMember) return t;
-
           const updatedMembers = [
             ...t.members,
             {
@@ -1060,15 +1393,20 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       userId: inv.ownerId,
       title: 'Invitation Accepted! 🎉',
       message: `${user.fullName} accepted your invitation to join ${inv.teamName} as ${inv.roleName}!`,
-      type: 'SELECTION_UPDATE',
+      type: 'INVITATION_ACCEPTED',
       link: `/team/${inv.teamId}`,
       isRead: false,
       createdAt: new Date().toISOString(),
     };
     setNotifications((prev) => [ownerNotif, ...prev]);
+
+    return { success: true, message: `You have successfully joined ${inv.teamName}!` };
   };
 
   const declineInvitation = (invitationId: string) => {
+    const inv = invitations.find((i) => i.id === invitationId);
+    if (!inv) return;
+
     setInvitations((prev) =>
       prev.map((i) =>
         i.id === invitationId
@@ -1076,6 +1414,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           : i
       )
     );
+
+    // Notify team owner
+    const ownerNotif: Notification = {
+      id: 'notif-' + Date.now(),
+      userId: inv.ownerId,
+      title: 'Invitation Declined',
+      message: `${user?.fullName || 'Candidate'} declined the invitation to join ${inv.teamName} as ${inv.roleName}.`,
+      type: 'INVITATION_DECLINED',
+      link: `/team/${inv.teamId}`,
+      isRead: false,
+      createdAt: new Date().toISOString(),
+    };
+    setNotifications((prev) => [ownerNotif, ...prev]);
   };
 
   const cancelInvitation = (invitationId: string) => {
@@ -1204,6 +1555,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return invitations.filter((i) => i.ownerId === user.id);
   };
 
+  // Computed Join Requests
+  const mySentJoinRequests = user
+    ? joinRequests.filter((r) => r.candidateId === user.id)
+    : [];
+  const getJoinRequestsForTeam = (teamId: string) => {
+    return joinRequests.filter((r) => r.teamId === teamId);
+  };
+  const allMyReceivedJoinRequests = user
+    ? joinRequests.filter((r) => r.ownerId === user.id)
+    : [];
+
   // Computed Notifications
   const userNotifications = user
     ? notifications.filter((n) => n.userId === user.id)
@@ -1282,6 +1644,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         createTeam,
         updateTeam,
         getTeamById,
+        removeTeamMember,
+        leaveTeam,
+        joinRequests,
+        mySentJoinRequests,
+        getJoinRequestsForTeam,
+        allMyReceivedJoinRequests,
+        createJoinRequest,
+        approveJoinRequest,
+        declineJoinRequest,
+        cancelJoinRequest,
         invitations,
         myReceivedInvitations,
         mySentInvitations,

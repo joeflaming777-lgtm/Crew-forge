@@ -255,12 +255,42 @@ export interface Invitation {
   respondedAt?: string;
 }
 
+export interface JoinRequest {
+  id: string;
+  teamId: string;
+  teamName: string;
+  hackathonName: string;
+  ownerId: string;
+  candidateId: string;
+  candidateName: string;
+  candidateEmail: string;
+  candidateAvatar?: string;
+  candidateDepartment?: string;
+  candidateCollege?: string;
+  candidateScore?: number;
+  candidateSkills?: string[];
+  roleName: string;
+  message?: string;
+  status: 'PENDING' | 'APPROVED' | 'DECLINED' | 'CANCELLED';
+  createdAt: string;
+  respondedAt?: string;
+}
+
 export interface Notification {
   id: string;
   userId: string;
   title: string;
   message: string;
-  type: 'INVITATION' | 'TEAM_UPDATE' | 'SELECTION_UPDATE' | 'SYSTEM';
+  type:
+    | 'INVITATION'
+    | 'JOIN_REQUEST'
+    | 'JOIN_APPROVED'
+    | 'JOIN_DECLINED'
+    | 'INVITATION_ACCEPTED'
+    | 'INVITATION_DECLINED'
+    | 'TEAM_UPDATE'
+    | 'SELECTION_UPDATE'
+    | 'SYSTEM';
   link?: string;
   isRead: boolean;
   createdAt: string;

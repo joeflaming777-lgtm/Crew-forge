@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import {
   Layers,
   Users,
@@ -14,13 +14,34 @@ import {
   PlusCircle,
   Clock,
   CheckCircle,
+  UserMinus,
+  Check,
+  X,
+  Mail,
+  AlertTriangle,
+  Award,
 } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
+import { useToast } from '../../contexts/ToastContext';
+import { Modal } from '../../components/common/Modal';
+import { ScoreRing } from '../../components/common/ScoreRing';
+import confetti from 'canvas-confetti';
 
 export const TeamOwnerDashboard: React.FC = () => {
   const { id } = useParams<{ id: string }>();
-  const { getTeamById, user, mySentInvitations } = useAuth();
+  const {
+    getTeamById,
+    user,
+    mySentInvitations,
+    getJoinRequestsForTeam,
+    approveJoinRequest,
+    declineJoinRequest,
+    removeTeamMember,
+  } = useAuth();
+  const toast = useToast();
   const navigate = useNavigate();
+
+  const [memberToRemove, setMemberToRemove] = useState<{ userId: string; fullName: string } | null>(null);
 
   const team = getTeamById(id || '');
 
@@ -38,6 +59,31 @@ export const TeamOwnerDashboard: React.FC = () => {
   const isOwner = user?.id === team.ownerId;
   const sentInvites = mySentInvitations(team.id);
   const pendingSentCount = sentInvites.filter((i) => i.status === 'PENDING').length;
+
+  const teamJoinRequests = getJoinRequestsForTeam(team.id);
+  const pendingRequests = teamJoinRequests.filter((r) => r.status === 'PENDING');
+
+  const handleApprove = (requestId: string) => {
+    const res = approveJoinRequest(requestId);
+    if (res.success) {
+      confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
+      toast.success(res.message);
+    } else {
+      toast.error(res.message);
+    }
+  };
+
+  const handleDecline = (requestId: string) => {
+    declineJoinRequest(requestId);
+    toast.info('Join request declined.');
+  };
+
+  const handleConfirmRemoveMember = () => {
+    if (!memberToRemove) return;
+    removeTeamMember(team.id, memberToRemove.userId);
+    toast.success(`${memberToRemove.fullName} was removed from the squad.`);
+    setMemberToRemove(null);
+  };
 
   if (!isOwner) {
     return (
@@ -154,8 +200,8 @@ export const TeamOwnerDashboard: React.FC = () => {
           </div>
         </motion.div>
 
-        {/* 3 Quick Navigation Tabs */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '1.25rem', marginBottom: '2.5rem' }}>
+        {/* 4 Quick Navigation Tabs */}
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '1.25rem', marginBottom: '2.5rem' }}>
           <Link
             to={`/team/${team.id}/candidates`}
             className="glass-card"
@@ -210,6 +256,42 @@ export const TeamOwnerDashboard: React.FC = () => {
             <ArrowRight size={18} color="#94a3b8" />
           </Link>
 
+          <a
+            href="#join-requests"
+            className="glass-card"
+            style={{
+              padding: '1.5rem',
+              borderRadius: '18px',
+              border: '1px solid rgba(245, 158, 11, 0.25)',
+              background: 'linear-gradient(135deg, rgba(245, 158, 11, 0.08) 0%, rgba(20, 28, 48, 0.9) 100%)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              textDecoration: 'none',
+              transition: 'transform 0.2s',
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+              <div style={{ width: '44px', height: '44px', borderRadius: '12px', background: 'rgba(245,158,11,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <Mail size={22} color="#fbbf24" />
+              </div>
+              <div>
+                <div style={{ fontWeight: 700, color: '#f8fafc', fontSize: '1rem', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                  Join Requests
+                  {pendingRequests.length > 0 && (
+                    <span style={{ fontSize: '0.75rem', padding: '1px 7px', borderRadius: '9999px', background: '#f59e0b', color: '#000', fontWeight: 800 }}>
+                      {pendingRequests.length}
+                    </span>
+                  )}
+                </div>
+                <div style={{ fontSize: '0.8rem', color: '#94a3b8' }}>
+                  {pendingRequests.length} pending candidate review
+                </div>
+              </div>
+            </div>
+            <ArrowRight size={18} color="#94a3b8" />
+          </a>
+
           <Link
             to={`/team/${team.id}/settings`}
             className="glass-card"
@@ -237,9 +319,176 @@ export const TeamOwnerDashboard: React.FC = () => {
           </Link>
         </div>
 
+        {/* ================= REVIEW JOIN REQUESTS SECTION ================= */}
+        <div id="join-requests" style={{ marginBottom: '3rem' }}>
+          <div className="glass-card" style={{ padding: '2rem', borderRadius: '22px', border: '1px solid rgba(245, 158, 11, 0.25)' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.25rem', flexWrap: 'wrap', gap: '8px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <Mail size={20} color="#fbbf24" />
+                <h3 style={{ fontSize: '1.3rem', fontWeight: 800, color: '#f8fafc' }}>
+                  Review Join Requests
+                </h3>
+                <span
+                  style={{
+                    fontSize: '0.75rem',
+                    fontWeight: 700,
+                    padding: '2px 8px',
+                    borderRadius: '9999px',
+                    background: pendingRequests.length > 0 ? 'rgba(245, 158, 11, 0.2)' : 'rgba(255, 255, 255, 0.05)',
+                    color: pendingRequests.length > 0 ? '#fbbf24' : '#94a3b8',
+                  }}
+                >
+                  {pendingRequests.length} Pending
+                </span>
+              </div>
+
+              <span style={{ fontSize: '0.8rem', color: '#94a3b8' }}>
+                Capacity: {team.currentMemberCount} / {team.maxTeamSize}
+              </span>
+            </div>
+
+            {pendingRequests.length === 0 ? (
+              <div style={{ padding: '2.5rem 1rem', textAlign: 'center', color: '#94a3b8' }}>
+                <Clock size={36} color="#64748b" style={{ margin: '0 auto 8px' }} />
+                <p style={{ fontSize: '0.95rem', color: '#f8fafc', fontWeight: 600 }}>No pending join requests</p>
+                <p style={{ fontSize: '0.85rem', color: '#94a3b8', marginTop: '4px' }}>
+                  Candidates browsing teams on SkillSync can request to join. You can also proactively discover and invite candidates.
+                </p>
+              </div>
+            ) : (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                {pendingRequests.map((req) => (
+                  <div
+                    key={req.id}
+                    style={{
+                      padding: '1.5rem',
+                      borderRadius: '16px',
+                      background: 'linear-gradient(135deg, rgba(20, 28, 48, 0.8) 0%, rgba(13, 18, 32, 0.9) 100%)',
+                      border: '1px solid rgba(255, 255, 255, 0.08)',
+                      display: 'flex',
+                      flexWrap: 'wrap',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      gap: '1.25rem',
+                    }}
+                  >
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '14px', flex: '1 1 320px' }}>
+                      {req.candidateAvatar ? (
+                        <img
+                          src={req.candidateAvatar}
+                          alt={req.candidateName}
+                          style={{ width: '48px', height: '48px', borderRadius: '50%', objectFit: 'cover' }}
+                        />
+                      ) : (
+                        <div
+                          style={{
+                            width: '48px',
+                            height: '48px',
+                            borderRadius: '50%',
+                            background: '#6366f1',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            fontWeight: 700,
+                            color: '#fff',
+                            fontSize: '1rem',
+                          }}
+                        >
+                          {req.candidateName[0]}
+                        </div>
+                      )}
+
+                      <div>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                          <span style={{ fontWeight: 800, color: '#f8fafc', fontSize: '1.05rem' }}>
+                            {req.candidateName}
+                          </span>
+                          <span
+                            style={{
+                              fontSize: '0.75rem',
+                              fontWeight: 700,
+                              padding: '2px 8px',
+                              borderRadius: '6px',
+                              background: 'rgba(56, 189, 248, 0.15)',
+                              color: '#38bdf8',
+                            }}
+                          >
+                            Requested Role: {req.roleName}
+                          </span>
+                        </div>
+
+                        <div style={{ fontSize: '0.825rem', color: '#94a3b8', marginTop: '2px' }}>
+                          {req.candidateCollege} • {req.candidateDepartment}
+                        </div>
+
+                        {req.message && (
+                          <div style={{ fontSize: '0.85rem', color: '#cbd5e1', fontStyle: 'italic', marginTop: '6px' }}>
+                            "{req.message}"
+                          </div>
+                        )}
+
+                        {req.candidateSkills && req.candidateSkills.length > 0 && (
+                          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px', marginTop: '6px' }}>
+                            {req.candidateSkills.map((sk, idx) => (
+                              <span
+                                key={idx}
+                                style={{
+                                  fontSize: '0.7rem',
+                                  padding: '1px 6px',
+                                  borderRadius: '4px',
+                                  background: 'rgba(255,255,255,0.05)',
+                                  color: '#cbd5e1',
+                                }}
+                              >
+                                {sk}
+                              </span>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+                      <div style={{ textAlign: 'right' }}>
+                        <div style={{ fontSize: '0.725rem', color: '#94a3b8' }}>Overall Score</div>
+                        <div style={{ fontSize: '1.25rem', fontWeight: 800, color: '#2dd4bf' }}>
+                          {req.candidateScore}%
+                        </div>
+                      </div>
+
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        <button
+                          onClick={() => handleApprove(req.id)}
+                          className="btn-primary btn-sm"
+                          style={{
+                            padding: '8px 16px',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '6px',
+                            background: 'linear-gradient(135deg, #06b6d4, #10b981)',
+                          }}
+                        >
+                          <Check size={15} /> Approve
+                        </button>
+                        <button
+                          onClick={() => handleDecline(req.id)}
+                          className="btn-secondary btn-sm"
+                          style={{ padding: '8px 12px' }}
+                        >
+                          <X size={15} /> Decline
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+
         {/* Current Squad & Open Positions Two-Column Grid */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '2rem' }}>
-          {/* Current Members */}
+          {/* Current Members with Member Removal */}
           <div className="glass-card" style={{ padding: '2rem', borderRadius: '20px', border: '1px solid rgba(255,255,255,0.08)' }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.5rem' }}>
               <h3 style={{ fontSize: '1.25rem', fontWeight: 700, color: '#f8fafc' }}>
@@ -290,7 +539,7 @@ export const TeamOwnerDashboard: React.FC = () => {
                     )}
                     <div>
                       <div style={{ fontWeight: 700, color: '#f8fafc', fontSize: '0.925rem' }}>
-                        {member.fullName}
+                        {member.fullName} {member.isOwner && <span style={{ color: '#2dd4bf', fontSize: '0.75rem' }}>(Owner)</span>}
                       </div>
                       <div style={{ fontSize: '0.8rem', color: member.isOwner ? '#2dd4bf' : '#38bdf8' }}>
                         {member.assignedRole}
@@ -298,18 +547,40 @@ export const TeamOwnerDashboard: React.FC = () => {
                     </div>
                   </div>
 
-                  <span
-                    style={{
-                      fontSize: '0.725rem',
-                      fontWeight: 700,
-                      padding: '2px 8px',
-                      borderRadius: '6px',
-                      background: member.isOwner ? 'rgba(45, 212, 191, 0.15)' : 'rgba(99, 102, 241, 0.15)',
-                      color: member.isOwner ? '#2dd4bf' : '#a5b4fc',
-                    }}
-                  >
-                    {member.isOwner ? 'Owner' : 'Member'}
-                  </span>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    {member.isOwner ? (
+                      <span
+                        style={{
+                          fontSize: '0.725rem',
+                          fontWeight: 700,
+                          padding: '2px 8px',
+                          borderRadius: '6px',
+                          background: 'rgba(45, 212, 191, 0.15)',
+                          color: '#2dd4bf',
+                        }}
+                      >
+                        Owner
+                      </span>
+                    ) : (
+                      <button
+                        onClick={() => setMemberToRemove({ userId: member.userId, fullName: member.fullName })}
+                        className="btn-secondary btn-sm"
+                        style={{
+                          padding: '4px 8px',
+                          fontSize: '0.75rem',
+                          color: '#f43f5e',
+                          border: '1px solid rgba(244, 63, 94, 0.25)',
+                          background: 'rgba(244, 63, 94, 0.08)',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '4px',
+                        }}
+                        title="Remove member from squad"
+                      >
+                        <UserMinus size={13} /> Remove
+                      </button>
+                    )}
+                  </div>
                 </div>
               ))}
             </div>
@@ -391,6 +662,43 @@ export const TeamOwnerDashboard: React.FC = () => {
             </div>
           </div>
         </div>
+
+        {/* Member Removal Confirmation Modal */}
+        {memberToRemove && (
+          <Modal
+            isOpen={!!memberToRemove}
+            onClose={() => setMemberToRemove(null)}
+            title={`Remove ${memberToRemove.fullName}?`}
+            maxWidth="480px"
+          >
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+              <div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px' }}>
+                <AlertTriangle size={24} color="#f43f5e" style={{ flexShrink: 0, marginTop: '2px' }} />
+                <p style={{ color: '#cbd5e1', fontSize: '0.9rem', lineHeight: 1.5 }}>
+                  Are you sure you want to remove <strong>{memberToRemove.fullName}</strong> from <strong>{team.name}</strong>? Their assigned role will be released back to open positions.
+                </p>
+              </div>
+
+              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px' }}>
+                <button
+                  type="button"
+                  onClick={() => setMemberToRemove(null)}
+                  className="btn-secondary btn-sm"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  onClick={handleConfirmRemoveMember}
+                  className="btn-primary btn-sm"
+                  style={{ background: '#e11d48' }}
+                >
+                  Confirm Remove
+                </button>
+              </div>
+            </div>
+          </Modal>
+        )}
       </div>
     </div>
   );

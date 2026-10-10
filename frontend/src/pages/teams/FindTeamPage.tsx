@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
+import { useNavigate, Link } from 'react-router-dom';
+import { motion, AnimatePresence } from 'framer-motion';
 import {
   Search,
   Filter,
@@ -13,13 +13,31 @@ import {
   ShieldCheck,
   ChevronRight,
   Info,
+  Send,
+  UserCheck,
+  Award,
+  Github,
+  CheckCircle2,
+  AlertCircle,
+  X,
 } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
-import { Team } from '../../types';
+import { useToast } from '../../contexts/ToastContext';
+import { Team, EnrichedCandidate } from '../../types';
+import { Modal } from '../../components/common/Modal';
+import { ScoreRing } from '../../components/common/ScoreRing';
 
 export const FindTeamPage: React.FC = () => {
-  const { teams, user } = useAuth();
+  const { teams, user, joinRequests, createJoinRequest, allCandidates } = useAuth();
+  const toast = useToast();
   const navigate = useNavigate();
+
+  // Modal states
+  const [requestModalTeam, setRequestModalTeam] = useState<Team | null>(null);
+  const [requestRole, setRequestRole] = useState<string>('');
+  const [requestMessage, setRequestMessage] = useState<string>('');
+  const [submittingRequest, setSubmittingRequest] = useState(false);
+  const [ownerProfileModal, setOwnerProfileModal] = useState<EnrichedCandidate | null>(null);
 
   // Filters state
   const [search, setSearch] = useState('');
@@ -115,6 +133,51 @@ export const FindTeamPage: React.FC = () => {
     maxSizeFilter,
     hasOpenPositionsOnly,
   ]);
+
+  const openOwnerProfile = (ownerId: string) => {
+    const candidate = allCandidates.find((c) => c.id === ownerId);
+    if (candidate) {
+      setOwnerProfileModal(candidate);
+    } else {
+      toast.info('Owner profile details are currently being updated.');
+    }
+  };
+
+  const openRequestModal = (team: Team) => {
+    if (!user) {
+      toast.error('Please log in to request to join a team.');
+      navigate('/login');
+      return;
+    }
+    setRequestModalTeam(team);
+    setRequestRole(
+      team.openRoles && team.openRoles.length > 0
+        ? team.openRoles[0]
+        : team.requiredRoles[0] || 'Member'
+    );
+    setRequestMessage('');
+  };
+
+  const handleSendRequest = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!requestModalTeam) return;
+
+    if (!requestRole.trim()) {
+      toast.error('Please select or specify a role.');
+      return;
+    }
+
+    setSubmittingRequest(true);
+    const result = createJoinRequest(requestModalTeam.id, requestRole, requestMessage);
+    setSubmittingRequest(false);
+
+    if (result.success) {
+      toast.success(result.message);
+      setRequestModalTeam(null);
+    } else {
+      toast.error(result.message);
+    }
+  };
 
   return (
     <div style={{ padding: '2.5rem 1.5rem 5rem' }}>
@@ -450,25 +513,25 @@ export const FindTeamPage: React.FC = () => {
                     {team.name}
                   </h3>
 
-                  {/* Team Leader / Owner */}
+                  {/* Team Leader / Owner with clickable profile */}
                   <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '1rem' }}>
                     {team.ownerAvatar ? (
                       <img
                         src={team.ownerAvatar}
                         alt={team.ownerName}
-                        style={{ width: '22px', height: '22px', borderRadius: '50%', objectFit: 'cover' }}
+                        style={{ width: '24px', height: '24px', borderRadius: '50%', objectFit: 'cover' }}
                       />
                     ) : (
                       <div
                         style={{
-                          width: '22px',
-                          height: '22px',
+                          width: '24px',
+                          height: '24px',
                           borderRadius: '50%',
                           background: '#06b6d4',
                           display: 'flex',
                           alignItems: 'center',
                           justifyContent: 'center',
-                          fontSize: '0.7rem',
+                          fontSize: '0.75rem',
                           fontWeight: 700,
                           color: '#fff',
                         }}
@@ -477,7 +540,22 @@ export const FindTeamPage: React.FC = () => {
                       </div>
                     )}
                     <span style={{ fontSize: '0.85rem', color: '#94a3b8' }}>
-                      Led by <strong style={{ color: '#e2e8f0' }}>{team.ownerName}</strong>
+                      Led by{' '}
+                      <button
+                        type="button"
+                        onClick={() => openOwnerProfile(team.ownerId)}
+                        style={{
+                          background: 'transparent',
+                          border: 'none',
+                          color: '#38bdf8',
+                          fontWeight: 700,
+                          cursor: 'pointer',
+                          padding: 0,
+                          textDecoration: 'underline',
+                        }}
+                      >
+                        {team.ownerName}
+                      </button>
                     </span>
                   </div>
 
@@ -546,7 +624,7 @@ export const FindTeamPage: React.FC = () => {
                   )}
                 </div>
 
-                {/* Card Footer: View Team Button (NO direct join button!) */}
+                {/* Card Footer: Status & Actions */}
                 <div
                   style={{
                     borderTop: '1px solid rgba(255,255,255,0.08)',
@@ -554,29 +632,272 @@ export const FindTeamPage: React.FC = () => {
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'space-between',
+                    flexWrap: 'wrap',
+                    gap: '8px',
                   }}
                 >
                   <div style={{ fontSize: '0.78rem', color: '#64748b' }}>
                     Min Score: {team.minCandidateScore}%
                   </div>
 
-                  <button
-                    onClick={() => navigate(`/find-team/${team.id}`)}
-                    className="btn-primary btn-sm"
-                    style={{
-                      padding: '8px 18px',
-                      fontSize: '0.875rem',
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '6px',
-                    }}
-                  >
-                    View Team <ChevronRight size={16} />
-                  </button>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    {user?.id === team.ownerId ? (
+                      <button
+                        onClick={() => navigate(`/team/${team.id}`)}
+                        className="btn-secondary btn-sm"
+                        style={{
+                          padding: '7px 14px',
+                          fontSize: '0.825rem',
+                          background: 'rgba(45, 212, 191, 0.15)',
+                          color: '#2dd4bf',
+                          border: '1px solid rgba(45, 212, 191, 0.3)',
+                        }}
+                      >
+                        Manage Team →
+                      </button>
+                    ) : team.members.some((m) => m.userId === user?.id) ? (
+                      <span
+                        style={{
+                          padding: '6px 12px',
+                          borderRadius: '8px',
+                          background: 'rgba(16, 185, 129, 0.15)',
+                          color: '#34d399',
+                          fontSize: '0.8rem',
+                          fontWeight: 700,
+                        }}
+                      >
+                        ✓ Official Member
+                      </span>
+                    ) : joinRequests.some((r) => r.teamId === team.id && r.candidateId === user?.id && r.status === 'PENDING') ? (
+                      <span
+                        style={{
+                          padding: '6px 12px',
+                          borderRadius: '8px',
+                          background: 'rgba(245, 158, 11, 0.15)',
+                          color: '#fbbf24',
+                          fontSize: '0.8rem',
+                          fontWeight: 700,
+                        }}
+                      >
+                        ⏳ Request Pending
+                      </span>
+                    ) : team.currentMemberCount >= team.maxTeamSize ? (
+                      <span
+                        style={{
+                          padding: '6px 12px',
+                          borderRadius: '8px',
+                          background: 'rgba(255, 255, 255, 0.05)',
+                          color: '#94a3b8',
+                          fontSize: '0.8rem',
+                          fontWeight: 600,
+                        }}
+                      >
+                        Squad Full
+                      </span>
+                    ) : (
+                      <button
+                        onClick={() => openRequestModal(team)}
+                        className="btn-primary btn-sm"
+                        style={{
+                          padding: '7px 14px',
+                          fontSize: '0.825rem',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '6px',
+                        }}
+                      >
+                        <Send size={13} /> Request to Join
+                      </button>
+                    )}
+
+                    <button
+                      onClick={() => navigate(`/find-team/${team.id}`)}
+                      className="btn-secondary btn-sm"
+                      style={{
+                        padding: '7px 12px',
+                        fontSize: '0.825rem',
+                      }}
+                    >
+                      Details
+                    </button>
+                  </div>
                 </div>
               </motion.div>
             ))}
           </div>
+        )}
+
+        {/* ================= REQUEST TO JOIN MODAL ================= */}
+        {requestModalTeam && (
+          <Modal
+            isOpen={!!requestModalTeam}
+            onClose={() => setRequestModalTeam(null)}
+            title={`Request to Join "${requestModalTeam.name}"`}
+            subtitle={`${requestModalTeam.hackathonName} • Owned by ${requestModalTeam.ownerName}`}
+            maxWidth="520px"
+          >
+            <form onSubmit={handleSendRequest} style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+              <div>
+                <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 700, color: '#f8fafc', marginBottom: '6px' }}>
+                  Select Position / Role you want to apply for *
+                </label>
+                {requestModalTeam.openRoles && requestModalTeam.openRoles.length > 0 ? (
+                  <select
+                    value={requestRole}
+                    onChange={(e) => setRequestRole(e.target.value)}
+                    style={{
+                      width: '100%',
+                      padding: '10px 14px',
+                      borderRadius: '10px',
+                      background: '#131b2e',
+                      border: '1px solid rgba(255,255,255,0.15)',
+                      color: '#fff',
+                      fontSize: '0.9rem',
+                    }}
+                  >
+                    {requestModalTeam.openRoles.map((r) => (
+                      <option key={r} value={r}>
+                        {r}
+                      </option>
+                    ))}
+                  </select>
+                ) : (
+                  <input
+                    type="text"
+                    value={requestRole}
+                    onChange={(e) => setRequestRole(e.target.value)}
+                    placeholder="e.g. Full Stack Developer"
+                    style={{
+                      width: '100%',
+                      padding: '10px 14px',
+                      borderRadius: '10px',
+                      background: '#131b2e',
+                      border: '1px solid rgba(255,255,255,0.15)',
+                      color: '#fff',
+                      fontSize: '0.9rem',
+                    }}
+                  />
+                )}
+              </div>
+
+              <div>
+                <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 700, color: '#f8fafc', marginBottom: '6px' }}>
+                  Note to Team Owner (Optional)
+                </label>
+                <textarea
+                  rows={3}
+                  value={requestMessage}
+                  onChange={(e) => setRequestMessage(e.target.value)}
+                  placeholder="Share your strengths, relevant project links or reason you'd like to collaborate..."
+                  style={{
+                    width: '100%',
+                    padding: '10px 14px',
+                    borderRadius: '10px',
+                    background: '#131b2e',
+                    border: '1px solid rgba(255,255,255,0.15)',
+                    color: '#fff',
+                    fontSize: '0.9rem',
+                    resize: 'none',
+                  }}
+                />
+              </div>
+
+              <div style={{ padding: '12px', borderRadius: '10px', background: 'rgba(99, 102, 241, 0.08)', border: '1px solid rgba(99, 102, 241, 0.2)', fontSize: '0.8rem', color: '#cbd5e1' }}>
+                Your current verified profile ({user?.fullName}, {user?.overallSkillScore}% skill score) will be shared with the team owner for review.
+              </div>
+
+              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px', marginTop: '0.5rem' }}>
+                <button
+                  type="button"
+                  onClick={() => setRequestModalTeam(null)}
+                  className="btn-secondary btn-sm"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={submittingRequest}
+                  className="btn-primary btn-sm"
+                  style={{ display: 'flex', alignItems: 'center', gap: '6px' }}
+                >
+                  <Send size={14} /> Send Join Request
+                </button>
+              </div>
+            </form>
+          </Modal>
+        )}
+
+        {/* ================= OWNER PROFILE MODAL ================= */}
+        {ownerProfileModal && (
+          <Modal
+            isOpen={!!ownerProfileModal}
+            onClose={() => setOwnerProfileModal(null)}
+            title="Team Owner Profile"
+            subtitle={`${ownerProfileModal.fullName} • ${ownerProfileModal.college}`}
+            maxWidth="580px"
+          >
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '1.25rem' }}>
+                <ScoreRing score={ownerProfileModal.overallScore} size={88} strokeWidth={8} label="Skill Score" />
+                <div>
+                  <h3 style={{ fontSize: '1.35rem', fontWeight: 800, color: '#f8fafc' }}>
+                    {ownerProfileModal.fullName}
+                  </h3>
+                  <div style={{ fontSize: '0.85rem', color: '#94a3b8', marginTop: '2px' }}>
+                    {ownerProfileModal.department} • Year {ownerProfileModal.year}
+                  </div>
+                  <div style={{ fontSize: '0.8rem', color: '#38bdf8', marginTop: '4px' }}>
+                    {ownerProfileModal.college}
+                  </div>
+                </div>
+              </div>
+
+              {ownerProfileModal.bio && (
+                <div>
+                  <div style={{ fontSize: '0.8rem', fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase', marginBottom: '6px' }}>
+                    Bio
+                  </div>
+                  <p style={{ fontSize: '0.9rem', color: '#cbd5e1', lineHeight: 1.6, background: 'rgba(255,255,255,0.03)', padding: '10px 14px', borderRadius: '10px' }}>
+                    {ownerProfileModal.bio}
+                  </p>
+                </div>
+              )}
+
+              <div>
+                <div style={{ fontSize: '0.8rem', fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase', marginBottom: '8px' }}>
+                  Verified Skills ({ownerProfileModal.skills.length})
+                </div>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
+                  {ownerProfileModal.skills.map((s) => (
+                    <span
+                      key={s.id}
+                      style={{
+                        padding: '4px 10px',
+                        borderRadius: '6px',
+                        background: 'rgba(56, 189, 248, 0.1)',
+                        border: '1px solid rgba(56, 189, 248, 0.25)',
+                        color: '#7dd3fc',
+                        fontSize: '0.8rem',
+                        fontWeight: 600,
+                      }}
+                    >
+                      {s.name} ({s.proficiency})
+                    </span>
+                  ))}
+                </div>
+              </div>
+
+              <div style={{ display: 'flex', justifyContent: 'flex-end', paddingTop: '1rem', borderTop: '1px solid rgba(255,255,255,0.08)' }}>
+                <button
+                  type="button"
+                  onClick={() => setOwnerProfileModal(null)}
+                  className="btn-secondary btn-sm"
+                >
+                  Close
+                </button>
+              </div>
+            </div>
+          </Modal>
         )}
       </div>
     </div>

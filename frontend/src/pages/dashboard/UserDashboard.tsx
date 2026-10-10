@@ -101,7 +101,7 @@ export const UserDashboard: React.FC = () => {
                   letterSpacing: '-0.02em',
                 }}
               >
-                Welcome back, {user.fullName.split(' ')[0]} 👋
+                Welcome back, {user.fullName}!
               </motion.h1>
               <motion.p
                 initial={{ opacity: 0, y: 15 }}
@@ -295,9 +295,10 @@ export const UserDashboard: React.FC = () => {
                   fontWeight: 800,
                   color: '#f8fafc',
                   marginBottom: '0.75rem',
+                  letterSpacing: '0.02em',
                 }}
               >
-                Find a Team
+                FIND A TEAM
               </h2>
 
               <p
@@ -308,7 +309,7 @@ export const UserDashboard: React.FC = () => {
                   marginBottom: '2rem',
                 }}
               >
-                Discover hackathon teams looking for your skills. Explore open roles across active hackathons.
+                Discover hackathon teams looking for your skills and experience.
               </p>
             </div>
 
@@ -326,11 +327,11 @@ export const UserDashboard: React.FC = () => {
                 textAlign: 'center',
               }}
             >
-              Explore Teams →
+              Explore Teams
             </Link>
           </motion.div>
 
-          {/* Card 2: BUILD A TEAM */}
+          {/* Card 2: CREATE A TEAM */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -371,9 +372,10 @@ export const UserDashboard: React.FC = () => {
                   fontWeight: 800,
                   color: '#f8fafc',
                   marginBottom: '0.75rem',
+                  letterSpacing: '0.02em',
                 }}
               >
-                Build a Team
+                CREATE A TEAM
               </h2>
 
               <p
@@ -384,7 +386,7 @@ export const UserDashboard: React.FC = () => {
                   marginBottom: '2rem',
                 }}
               >
-                Create a hackathon team and find the right people. Match candidates with your needed skills and roles.
+                Start a hackathon team, define the required skills and select your teammates.
               </p>
             </div>
 
@@ -404,7 +406,7 @@ export const UserDashboard: React.FC = () => {
                 boxShadow: '0 4px 15px rgba(6, 182, 212, 0.35)',
               }}
             >
-              Create a Team →
+              Create a Team
             </Link>
           </motion.div>
         </div>
