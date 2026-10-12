@@ -2,6 +2,10 @@
 
 > **Find Your People. Build Your Team.**
 
+🌐 **Live Website Deployment:** [https://crewforge-00vh.onrender.com/](https://crewforge-00vh.onrender.com/)
+
+[![Live Deployment](https://img.shields.io/badge/Live%20Deployment-Render-46E3B7?style=for-the-badge&logo=render&logoColor=white)](https://crewforge-00vh.onrender.com/)
+
 CrewForge is an intelligent hackathon team formation and candidate selection web platform designed for college students participating in hackathons such as the Smart India Hackathon (SIH).
 
 [![React](https://img.shields.io/badge/Frontend-React%2018%20%2B%20Vite-61DAFB?logo=react&logoColor=black)](https://react.dev/)
@@ -160,7 +164,7 @@ npm run dev:frontend  # Web App running on http://localhost:5173
 
 ## 🔑 Single User Login (1-Click Instant Demo Accounts)
 
-Open **[http://localhost:5173/login](http://localhost:5173/login)** to access the single User Login page. You can click any 1-click button or use the credentials below:
+Open **[https://crewforge-00vh.onrender.com/login](https://crewforge-00vh.onrender.com/login)** *(or locally at `http://localhost:5173/login`)* to access the single User Login page. You can click any 1-click button or use the credentials below:
 
 | Account | Email | Password | Role & Permissions |
 |---|---|---|---|
