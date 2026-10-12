@@ -37,7 +37,7 @@ export const LoginPage: React.FC = () => {
     try {
       setLoading(true);
       await login(email, password, intent);
-      toast.success('Welcome back to SkillSync!');
+      toast.success('Welcome back to CrewForge!');
       handleRedirectAfterAuth();
     } catch {
       toast.error('Login failed. Please check your credentials.');

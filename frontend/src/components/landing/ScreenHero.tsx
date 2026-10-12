@@ -87,7 +87,7 @@ export const ScreenHero: React.FC<ScreenHeroProps> = ({ onExploreClick }) => {
             marginBottom: '1.25rem',
           }}
         >
-          SKILLSYNC
+          CREWFORGE
         </motion.h1>
 
         {/* Tagline */}

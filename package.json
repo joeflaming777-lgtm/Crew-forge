@@ -1,7 +1,7 @@
 {
   "name": "hackmate-monorepo",
   "version": "1.0.0",
-  "description": "SkillSync - Smart Hackathon Team Formation & Candidate Selection Platform",
+  "description": "CrewForge - Smart Hackathon Team Formation & Candidate Selection Platform",
   "private": true,
   "workspaces": [
     "backend",
@@ -11,8 +11,10 @@
     "dev": "concurrently \"npm run dev --workspace=backend\" \"npm run dev --workspace=frontend\"",
     "dev:backend": "npm run dev --workspace=backend",
     "dev:frontend": "npm run dev --workspace=frontend",
-    "build": "npm run build --workspace=backend && npm run build --workspace=frontend",
+    "build": "npm run prisma:generate && npm run prisma:push && npm run seed && npm run build --workspace=backend && npm run build --workspace=frontend",
+    "start": "npm start --workspace=backend",
     "prisma:generate": "npm run prisma:generate --workspace=backend",
+    "prisma:push": "npm run prisma:push --workspace=backend",
     "prisma:migrate": "npm run prisma:migrate --workspace=backend",
     "prisma:seed": "npm run prisma:seed --workspace=backend",
     "seed": "npm run seed --workspace=backend"

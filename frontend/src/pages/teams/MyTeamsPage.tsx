@@ -58,7 +58,7 @@ export const MyTeamsPage: React.FC = () => {
               My Teams
             </h1>
             <p style={{ fontSize: '1.05rem', color: '#94a3b8', marginTop: '4px' }}>
-              One SkillSync account. Seamlessly manage squads you created alongside teams you've joined across hackathons.
+              One CrewForge account. Seamlessly manage squads you created alongside teams you've joined across hackathons.
             </p>
           </div>
 

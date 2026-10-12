@@ -546,7 +546,7 @@ export const TeamDetailPage: React.FC = () => {
               </div>
 
               <div style={{ padding: '12px', borderRadius: '10px', background: 'rgba(99, 102, 241, 0.08)', border: '1px solid rgba(99, 102, 241, 0.2)', fontSize: '0.8rem', color: '#cbd5e1' }}>
-                Your verified SkillSync profile ({user?.fullName}, {user?.overallSkillScore}% skill score) will be shared with the team owner for review.
+                Your verified CrewForge profile ({user?.fullName}, {user?.overallSkillScore}% skill score) will be shared with the team owner for review.
               </div>
 
               <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px', marginTop: '0.5rem' }}>

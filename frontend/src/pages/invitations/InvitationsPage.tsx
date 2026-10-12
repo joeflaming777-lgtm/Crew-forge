@@ -770,7 +770,7 @@ export const InvitationsPage: React.FC = () => {
                     You haven't created any teams yet
                   </h3>
                   <p style={{ color: '#94a3b8', fontSize: '0.9rem', marginTop: '4px', maxWidth: '440px', margin: '4px auto 1rem' }}>
-                    Every student on SkillSync can build and lead teams! Define required roles, publish your squad, and candidates will apply directly.
+                    Every student on CrewForge can build and lead teams! Define required roles, publish your squad, and candidates will apply directly.
                   </p>
                   <Link to="/build-team" className="btn-primary btn-sm">
                     Start a Hackathon Team →

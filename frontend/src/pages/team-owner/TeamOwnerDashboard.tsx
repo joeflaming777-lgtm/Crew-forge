@@ -352,7 +352,7 @@ export const TeamOwnerDashboard: React.FC = () => {
                 <Clock size={36} color="#64748b" style={{ margin: '0 auto 8px' }} />
                 <p style={{ fontSize: '0.95rem', color: '#f8fafc', fontWeight: 600 }}>No pending join requests</p>
                 <p style={{ fontSize: '0.85rem', color: '#94a3b8', marginTop: '4px' }}>
-                  Candidates browsing teams on SkillSync can request to join. You can also proactively discover and invite candidates.
+                  Candidates browsing teams on CrewForge can request to join. You can also proactively discover and invite candidates.
                 </p>
               </div>
             ) : (

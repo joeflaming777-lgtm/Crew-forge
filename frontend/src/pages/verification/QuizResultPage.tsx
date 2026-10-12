@@ -79,7 +79,7 @@ export const QuizResultPage: React.FC = () => {
           </h1>
 
           <p style={{ fontSize: '1.1rem', color: '#cbd5e1', maxWidth: '580px', margin: '0 auto 2rem', lineHeight: 1.6 }}>
-            Congratulations, {user?.fullName}! Your skills have been officially evaluated and your student profile is now 100% discoverable to SkillSync Team Owners.
+            Congratulations, {user?.fullName}! Your skills have been officially evaluated and your student profile is now 100% discoverable to CrewForge Team Owners.
           </p>
 
           <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '2rem' }}>

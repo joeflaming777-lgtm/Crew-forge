@@ -145,7 +145,7 @@ export const TeamCandidatesDiscovery: React.FC = () => {
   const handleOpenInviteModal = (cand: EnrichedCandidate) => {
     setInviteModalCandidate(cand);
     setInviteRole(team.openRoles[0] || cand.preferredRoles[0]?.name || 'Developer');
-    setInviteMessage(`Hi ${cand.fullName.split(' ')[0]}, we reviewed your profile on SkillSync and would love to have you on team "${team.name}" for ${team.hackathonName}!`);
+    setInviteMessage(`Hi ${cand.fullName.split(' ')[0]}, we reviewed your profile on CrewForge and would love to have you on team "${team.name}" for ${team.hackathonName}!`);
   };
 
   const handleSendInvite = () => {

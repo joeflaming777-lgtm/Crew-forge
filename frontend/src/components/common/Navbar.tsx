@@ -162,7 +162,7 @@ export const Navbar: React.FC = () => {
               WebkitTextFillColor: 'transparent',
             }}
           >
-            SkillSync
+            CrewForge
           </span>
         </Link>
 

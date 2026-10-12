@@ -2,6 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import path from 'path';
+import fs from 'fs';
 import apiRouter from './routes/api';
 
 dotenv.config();
@@ -32,12 +33,30 @@ app.get('/health', (req, res) => {
   res.json({
     status: 'ok',
     timestamp: new Date().toISOString(),
-    service: 'SkillSync API',
+    service: 'CrewForge API',
   });
 });
 
 // API Routes
 app.use('/api', apiRouter);
+
+// Serve frontend static assets in production if built
+const frontendDistPath = path.resolve(__dirname, '../../frontend/dist');
+if (fs.existsSync(frontendDistPath)) {
+  app.use(express.static(frontendDistPath));
+
+  // SPA fallback for non-API client routes (e.g. /login, /dashboard, /teams)
+  app.get('*', (req, res, next) => {
+    if (req.path.startsWith('/api') || req.path.startsWith('/health')) {
+      return next();
+    }
+    const indexPath = path.join(frontendDistPath, 'index.html');
+    if (fs.existsSync(indexPath)) {
+      return res.sendFile(indexPath);
+    }
+    next();
+  });
+}
 
 // Global Error Handler
 app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
@@ -49,6 +68,6 @@ app.use((err: any, req: express.Request, res: express.Response, next: express.Ne
 });
 
 app.listen(PORT, () => {
-  console.log(`🚀 SkillSync Backend running on http://localhost:${PORT}`);
+  console.log(`🚀 CrewForge Backend running on http://localhost:${PORT}`);
   console.log(`📡 API endpoints ready at http://localhost:${PORT}/api`);
 });
